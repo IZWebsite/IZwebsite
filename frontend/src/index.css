@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 45% 97%;
+    --foreground: 24 16% 15%;
+    --card: 40 50% 99%;
+    --card-foreground: 24 16% 15%;
+    --popover: 40 50% 99%;
+    --popover-foreground: 24 16% 15%;
+    --primary: 24 18% 16%;
+    --primary-foreground: 40 45% 97%;
+    --secondary: 37 38% 91%;
+    --secondary-foreground: 24 16% 15%;
+    --muted: 37 33% 92%;
+    --muted-foreground: 25 9% 40%;
+    --accent: 36 36% 52%;
+    --accent-foreground: 40 45% 97%;
+    --destructive: 2 55% 45%;
+    --destructive-foreground: 40 45% 97%;
+    --border: 35 25% 85%;
+    --input: 35 25% 82%;
+    --ring: 36 36% 52%;
+    --radius: 0.25rem;
+    --gold: #B08D57;
+    --champagne: #E8D9BF;
+    --chart-1: 36 36% 52%;
+    --chart-2: 24 18% 30%;
+    --chart-3: 30 30% 70%;
+    --chart-4: 15 35% 55%;
+    --chart-5: 45 40% 60%;
+  }
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground antialiased; font-family: 'Jost', system-ui, sans-serif; }
+  h1, h2, h3, .font-display { font-family: 'Cormorant Garamond', Georgia, serif; letter-spacing: 0.005em; }
+  ::selection { background: var(--champagne); }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+}
+
+@layer components {
+  .container-x { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10; }
+  .eyebrow { @apply text-[11px] uppercase tracking-[0.28em] text-[color:var(--gold)] font-medium; }
+  .btn { @apply inline-flex items-center justify-center gap-2 px-6 h-11 text-sm tracking-wide font-medium transition-[background-color,color,border-color,transform,opacity] duration-200 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]; }
+  .btn-primary { @apply btn bg-primary text-primary-foreground hover:bg-[#4a3a2e]; }
+  .btn-gold { @apply btn bg-[color:var(--gold)] text-white hover:bg-[#967545]; }
+  .btn-outline { @apply btn border border-foreground/80 hover:bg-foreground hover:text-background; }
+  .btn-ghost { @apply btn px-3 hover:bg-secondary; }
+  .input { @apply w-full h-11 px-3 bg-card border border-input text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:border-[color:var(--gold)] transition-colors; }
+  .label { @apply block text-xs uppercase tracking-[0.14em] text-muted-foreground mb-1.5; }
+  .card-x { @apply bg-card border border-border; }
+  .chip { @apply inline-flex items-center px-2.5 py-1 text-[11px] uppercase tracking-wider border border-border bg-card; }
+  .link-u { @apply underline-offset-4 hover:underline decoration-[color:var(--gold)]; }
+}
+
+.reveal { animation: reveal 0.7s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes reveal { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.grain::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .06; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+@media print { .no-print { display: none !important; } body { background: white; } }
