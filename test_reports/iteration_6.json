@@ -1,0 +1,24 @@
+{
+  "summary": "Frontend-only check of the 'Location permission was blocked' fix. (1) Config: /app/netlify.toml parses with tomllib. The [[headers]] for='/*' block now sets Permissions-Policy = 'camera=(), microphone=(), geolocation=(self)'. Nothing else sets a policy that blocks geolocation: there are no _headers files, nothing in frontend/public/index.html (no meta tag or iframe allow attribute), and the /static/* and /admin/* blocks do not set Permissions-Policy. Live check: curl -I https://izlive.netlify.app still returns 'permissions-policy: camera=(), microphone=(), geolocation=()', so the fix is not deployed yet. (2) Header simulation in Playwright: the preview document response was routed and Permissions-Policy was injected, with geolocation permission granted. With 'geolocation=()', document.featurePolicy.allowsFeature('geolocation') was false and getCurrentPosition failed with code 1 'Geolocation has been disabled in this document by permissions policy.' This reproduces the user's error. With 'geolocation=(self)', it returned 12.9716,77.5946. (3) /admin/settings used the iteration_5 mocks (fake session, auth/v1/user, rpc/my_role=owner, profiles; all writes blocked). Granted: location-use-current-btn filled lat 12.9716 and lng 77.5946, the 'Check on map' link appeared, and the toast 'Store location set — press Save' showed. Denied (permissions cleared, so the headless browser auto-denies the prompt): the fields stayed empty and the toast 'Location is blocked for this site. Tap the lock icon next to the web address → Site settings → Location → Allow, then try again. Or type the latitude and longitude from Google Maps.' appeared. Blocked by the simulated header geolocation=(): the same code-1 toast appeared.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "The user must push and redeploy to Netlify. The live site still sends 'geolocation=()', so the button will keep failing with code 1 until the new netlify.toml is deployed. After deploying, confirm with: curl -I https://izlive.netlify.app | grep -i permissions-policy (expect geolocation=(self)).",
+    "Optional UX: when the header blocks geolocation (code 1 with featurePolicy disallowing it), the 'Site settings → Allow' advice cannot help. You could check document.featurePolicy?.allowsFeature('geolocation') and show a different message."
+  ],
+  "critical_code_review_comments": [
+    "LocationGate.locate() treats any error as 'denied'. While the live header blocks geolocation, every shopper falls into the 'denied / farther' pricing tier and gets the extra amount. This makes redeploying urgent if location pricing is enabled."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "None used. Owner access was mocked in the browser only (/app/memory/test_credentials.md: no accounts).",
+  "seed_data_creation": "None. All non-GET Supabase requests (price_zone, admin_staff RPCs, DELETE cart_items) were blocked or fulfilled locally.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "To simulate the live header, use page.route(BASE+'/**'), and for document requests call route.fetch() and route.fulfill(response=resp, headers={...,'permissions-policy': X}). Use ctx.set_geolocation and ctx.grant_permissions(['geolocation'], origin=BASE) for the granted case, and ctx.clear_permissions() for the denied case (headless auto-denies). For admin access, reuse the iteration_5 Supabase mocks."
+}

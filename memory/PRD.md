@@ -57,6 +57,11 @@ User choices: Supabase + Netlify; Razorpay ready for test keys (online payment o
 - Tests: 16/16 SQL tests pass (new location test: near 899, far/unknown/spoofed 949, order stores extra). Screenshot with mocked RPC: far prices 999→1049, sale 799→849; the gate appears when permission isn't granted.
 - User must run 0004 in Supabase SQL editor. Re-run it after any re-run of 0002.
 
+## Update (2026-10-21): location permission fix
+- Root cause of "Location permission was blocked": netlify.toml sent `Permissions-Policy: geolocation=()`, which disables geolocation on every page. Changed to `geolocation=(self)`.
+- Admin "Use my current location" now shows a specific message for blocked (with how to allow), timeout, or unavailable.
+- Testing agent iteration_6: config verified; the old header reproduces code 1, the new header works; admin button fills lat/lng. Live site still sends the old header until redeployed.
+
 ## Pending / Backlog
 - P0: The user must run `supabase/setup_all.sql` in the Supabase SQL Editor and create the owner role (README). After that, run end-to-end UI testing on the live Supabase project.
 - P0: Add Netlify env vars (service role, Razorpay test keys, webhook secret, Resend), deploy, and verify.
