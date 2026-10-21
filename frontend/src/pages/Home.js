@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, Banknote, Truck, RotateCcw, Sparkles } from "lucide-react";
+import { Star, Banknote, Truck, RotateCcw, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { supabase, errMsg } from "../lib/supabase";
 import { useStore } from "../context/StoreContext";
@@ -87,19 +87,32 @@ const Row = ({ s, items, loading }) => {
 
 function Categories({ s }) {
   const { categories } = useStore();
+  const ref = useRef(null);
+  const slide = (d) => ref.current?.scrollBy({ left: d * ref.current.clientWidth * 0.8, behavior: "smooth" });
+  const [over, setOver] = useState(false);
+  useEffect(() => {
+    const f = () => setOver(!!ref.current && ref.current.scrollWidth > ref.current.clientWidth + 4);
+    f(); window.addEventListener("resize", f);
+    return () => window.removeEventListener("resize", f);
+  }, [categories]);
   const featured = categories.filter((c) => c.is_featured && c.is_visible);
   const list = featured.length ? featured : categories.filter((c) => c.is_visible);
   if (!list.length) return null;
   return (
     <section className="container-x pt-10 md:pt-14 pb-4" data-testid="home-section-categories">
       {s.title && <SectionHead eyebrow={s.subtitle} title={s.title} action="All categories" to="/shop" />}
-      <div className="flex gap-3 md:gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-2" data-testid="category-scroll-row">
+      <div className="relative group/row">
+      {over && [-1, 1].map((d) => (
+        <button key={d} onClick={() => slide(d)} aria-label={d < 0 ? "Previous categories" : "Next categories"} className={`hidden md:flex absolute top-[38%] -translate-y-1/2 z-10 h-11 w-11 items-center justify-center rounded-full bg-white/95 shadow-md border hover:bg-[#2b2420] hover:text-white transition-colors ${d < 0 ? "-left-5" : "-right-5"}`} data-testid={d < 0 ? "category-prev-btn" : "category-next-btn"}>{d < 0 ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}</button>
+      ))}
+      <div ref={ref} className="flex gap-3 md:gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-2" data-testid="category-scroll-row">
         {list.map((c, n) => (
           <Link key={c.id} to={`/shop?category=${c.slug}`} className="group shrink-0 snap-start w-[30%] sm:w-40 md:w-48 text-center" data-testid={`category-tile-${c.slug}`}>
             <div className="overflow-hidden rounded-xl bg-muted aspect-square"><img src={c.image_url || CAT_FALLBACK[n % CAT_FALLBACK.length]} alt={c.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" /></div>
             <p className="mt-2.5 text-[11px] md:text-xs uppercase tracking-[0.18em] group-hover:text-[color:var(--gold)] transition-colors truncate">{c.name}</p>
           </Link>
         ))}
+      </div>
       </div>
     </section>
   );

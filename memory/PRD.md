@@ -34,6 +34,10 @@ User choices: Supabase + Netlify; Razorpay ready for test keys (online payment o
 - Root cause of hidden sections: no published products/reviews in the DB, and marquee/features/tabs rows were missing from homepage_content.
 - The loader is NOT tested against the real DB (it would write to customer data).
 
+## Update (2026-10-21): category arrows + bulk upload
+- Homepage category row: left/right arrow buttons on desktop, shown only when the row overflows (verified at 900px; hidden at 1920px with 5 tiles).
+- Admin → Products → "Bulk upload" (BulkUpload.js) replaces the old CSV import: template download, .xlsx (read-excel-file/universal) or .csv, row-by-row preview with errors and warnings, category matched by name or slug, image_urls separated by |, Yes/No flags, new SKUs inserted and existing SKUs updated (slug kept), images appended without duplicates. NOT tested end-to-end (no owner login; it would write to customer data).
+
 ## Pending / Backlog
 - P0: The user must run `supabase/setup_all.sql` in the Supabase SQL Editor and create the owner role (README). After that, run end-to-end UI testing on the live Supabase project.
 - P0: Add Netlify env vars (service role, Razorpay test keys, webhook secret, Resend), deploy, and verify.

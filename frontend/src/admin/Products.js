@@ -7,6 +7,7 @@ import { useStore } from "../context/StoreContext";
 import { inr, fmtDate, slugify, toCSV, parseCSV, download } from "../lib/format";
 import { Field, Spinner } from "../components/Bits";
 import { Card, PageTitle, confirmAction } from "./kit";
+import BulkUpload from "./BulkUpload";
 
 export function Products() {
   const { categories } = useStore();
@@ -32,31 +33,16 @@ export function Products() {
     const { data } = await supabase.from("products").select("sku,name,slug,price,sale_price,stock,status,description,material,finish,colour,is_anti_tarnish,is_featured,is_new,categories(slug)");
     download("products.csv", toCSV((data || []).map(({ categories: c, ...p }) => ({ ...p, category_slug: c?.slug || "" }))));
   };
-  const importCsv = async (e) => {
-    const file = e.target.files?.[0]; if (!file) return;
-    const recs = parseCSV(await file.text());
-    const catBy = Object.fromEntries(categories.map((c) => [c.slug, c.id]));
-    const bad = recs.filter((r) => !r.sku || !r.name || isNaN(Number(r.price)));
-    if (bad.length) { toast.error(`${bad.length} rows are missing sku, name or price`); e.target.value = ""; return; }
-    const rows = recs.map((r) => ({
-      sku: r.sku.trim(), name: r.name.trim(), slug: r.slug?.trim() || slugify(`${r.name}-${r.sku}`), price: Number(r.price),
-      sale_price: r.sale_price ? Number(r.sale_price) : null, stock: Number(r.stock || 0), status: ["draft", "published", "archived"].includes(r.status) ? r.status : "draft",
-      description: r.description || null, material: r.material || null, finish: r.finish || null, colour: r.colour || null,
-      is_anti_tarnish: r.is_anti_tarnish === "true", is_featured: r.is_featured === "true", is_new: r.is_new === "true", category_id: catBy[r.category_slug] || null,
-    }));
-    const { error } = await supabase.from("products").upsert(rows, { onConflict: "sku" });
-    e.target.value = "";
-    if (error) return toast.error(errMsg(error));
-    toast.success(`Imported ${rows.length} products`); load();
-  };
+  const [bulk, setBulk] = useState(false);
   const n = Object.keys(edits).length;
   return (
     <div data-testid="admin-products">
       <PageTitle title="Products">
         <button className="btn-outline h-10" onClick={exportCsv} data-testid="products-export-btn"><Download size={15} />CSV</button>
-        <label className="btn-outline h-10 cursor-pointer"><Upload size={15} />Import<input type="file" accept=".csv" className="hidden" onChange={importCsv} data-testid="products-import-input" /></label>
+        <button className="btn-outline h-10" onClick={() => setBulk(!bulk)} data-testid="bulk-upload-btn"><Upload size={15} />Bulk upload</button>
         <Link to="/admin/products/new" className="btn-primary h-10" data-testid="add-product-btn"><Plus size={15} />Add product</Link>
       </PageTitle>
+      {bulk && <div className="mb-6"><BulkUpload onClose={() => setBulk(false)} onDone={load} /></div>}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
         <input className="input col-span-2 md:col-span-1" placeholder="Search name or SKU" value={f.q} onChange={(e) => setF({ ...f, q: e.target.value })} data-testid="products-search-input" />
         <select className="input" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })} data-testid="products-status-filter"><option value="">All statuses</option><option value="published">Published</option><option value="draft">Draft</option><option value="archived">Archived</option></select>
