@@ -258,3 +258,43 @@ def test_return_window_and_cancel_by_customer():
     r3 = place(pid, 1, uid=u)
     with pytest.raises(Exception, match="within"):
         q("select customer_request_return(%s, null, 'too early')", (r3["order_number"],), role="authenticated", uid=u)
+
+
+
+def geo_q(sql, args, geo):
+    c = conn()
+    try:
+        with c.cursor() as cur:
+            cur.execute("begin")
+            cur.execute("set local role anon")
+            if geo:
+                cur.execute("select set_config('request.headers', %s, true)", (json.dumps({"x-geo": geo}),))
+            cur.execute(sql, args)
+            r = cur.fetchone()[0]
+            cur.execute("commit")
+            return r
+    finally:
+        c.close()
+
+
+def test_location_pricing_server_side():
+    q("""update store_settings set value = '{"enabled": true, "lat": 26.9124, "lng": 75.7873, "radius_km": 10, "extra_amount": 50}' where key = 'location_pricing'""")
+    try:
+        assert q("select is_public from store_settings where key = 'location_pricing'", one=True) is False
+        assert q("select count(*) from store_settings where key = 'location_pricing'", role="anon", one=True) == 0
+        pid = new_product(stock=5, price=899)
+        items = json.dumps([{"product_id": str(pid), "quantity": 2}])
+        near = geo_q("select quote_cart(%s::jsonb)", (items,), "26.9200,75.8000")
+        far = geo_q("select quote_cart(%s::jsonb)", (items,), "28.6139,77.2090")
+        unknown = geo_q("select quote_cart(%s::jsonb)", (items,), None)
+        spoof = geo_q("select quote_cart(%s::jsonb)", (items,), "not-a-location")
+        assert float(near["lines"][0]["unit_price"]) == 899 and float(near["subtotal"]) == 1798
+        assert float(far["lines"][0]["unit_price"]) == 949 and float(far["subtotal"]) == 1898
+        assert float(unknown["subtotal"]) == 1898 and float(spoof["subtotal"]) == 1898
+        assert geo_q("select price_zone()", (), "26.9200,75.8000") == {"enabled": True, "extra": 0}
+        assert float(geo_q("select price_zone()", (), "28.6139,77.2090")["extra"]) == 50
+        o = geo_q("select place_order(%s::jsonb, %s::jsonb, %s::jsonb, null, 'cod')", (json.dumps([{"product_id": str(pid), "quantity": 1}]), json.dumps(CONTACT), json.dumps(ADDR)), "28.6139,77.2090")
+        row = q("select total, location_extra, customer_geo from orders where id = %s", (o["order_id"],))[0]
+        assert float(row[1]) == 50 and row[2] == "28.6139,77.2090" and float(row[0]) == 949 + 79
+    finally:
+        q("""update store_settings set value = '{"enabled": false, "radius_km": 10, "extra_amount": 0}' where key = 'location_pricing'""")

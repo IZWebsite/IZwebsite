@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "./components/ui/sonner";
+import LocationGate, { LocatingOverlay } from "./components/LocationGate";
 import { StoreProvider } from "./context/StoreContext";
 import { AuthProvider } from "./context/AuthContext";
 import { ShopProvider } from "./context/ShopContext";
@@ -65,6 +66,8 @@ export default function App() {
               </Routes>
             </Suspense>
             <Toaster position="top-center" richColors />
+            <LocationGate />
+            <LocatingOverlay />
           </ShopProvider>
         </AuthProvider>
       </StoreProvider>

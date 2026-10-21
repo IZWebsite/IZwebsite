@@ -10,6 +10,7 @@ import { useStore } from "../context/StoreContext";
 import { useSeo } from "../lib/seo";
 import { track } from "../lib/analytics";
 import { getRecent, pushRecent } from "../lib/format";
+import { geoExtra } from "../lib/geo";
 import ProductCard from "../components/ProductCard";
 import { Price, SectionHead, Empty } from "../components/Bits";
 
@@ -92,7 +93,7 @@ export default function Product() {
   const jsonLd = useMemo(() => d && !d.missing ? {
     "@context": "https://schema.org", "@type": "Product", name: d.name, sku: d.sku, description: d.seo_description || d.description,
     image: d.images.map((i) => new URL(i.url, window.location.origin).href), brand: { "@type": "Brand", name: "IMINATIONZ" },
-    offers: { "@type": "Offer", priceCurrency: "INR", price: Number(d.sale_price ?? d.price), availability: (d.c?.available ?? 0) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock", url: window.location.href },
+    offers: { "@type": "Offer", priceCurrency: "INR", price: Number(d.sale_price ?? d.price) + geoExtra(), availability: (d.c?.available ?? 0) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock", url: window.location.href },
   } : null, [d]);
   useSeo({ title: d?.seo_title || d?.name, description: d?.seo_description || d?.description?.slice(0, 155), image: d?.images?.[0]?.url, jsonLd });
 

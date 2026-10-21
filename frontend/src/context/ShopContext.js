@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "../lib/supabase";
+import { geoExtra, useGeo } from "../lib/geo";
 import { track } from "../lib/analytics";
 import { useAuth } from "./AuthContext";
 
@@ -14,6 +15,15 @@ export function ShopProvider({ children }) {
   const [wishlist, setWishlist] = useState(() => read("imz_wish"));
   const [cartOpen, setCartOpen] = useState(false);
   const synced = useRef(null);
+  const { extra } = useGeo();
+
+  // refresh stored cart prices when the location price changes
+  const lastExtra = useRef(extra);
+  useEffect(() => {
+    const d = extra - lastExtra.current;
+    lastExtra.current = extra;
+    if (d) setItems((prev) => prev.map((i) => ({ ...i, price: Number(i.price || 0) + d })));
+  }, [extra]);
 
   // merge guest cart/wishlist into the account on login, then load server copy
   useEffect(() => {
@@ -28,7 +38,7 @@ export function ShopProvider({ children }) {
       const pm = Object.fromEntries((prods || []).map((p) => [p.id, p]));
       setItems([...map.values()].filter((i) => pm[i.product_id]).map((i) => {
         const local = read("imz_cart").find((x) => key(x) === key(i));
-        return { ...local, product_id: i.product_id, variant_id: i.variant_id, quantity: i.quantity, name: pm[i.product_id].name, slug: pm[i.product_id].slug, image_url: pm[i.product_id].image_url, price: local?.price ?? pm[i.product_id].effective_price };
+        return { ...local, product_id: i.product_id, variant_id: i.variant_id, quantity: i.quantity, name: pm[i.product_id].name, slug: pm[i.product_id].slug, image_url: pm[i.product_id].image_url, price: local?.price ?? Number(pm[i.product_id].effective_price) + geoExtra() };
       }));
       const { data: w } = await supabase.from("wishlists").select("product_id").eq("user_id", user.id);
       const merged = [...new Set([...(w || []).map((x) => x.product_id), ...read("imz_wish")])];
@@ -55,7 +65,7 @@ export function ShopProvider({ children }) {
   const add = (product, qty = 1, variant = null) => {
     const available = variant ? variant.stock - variant.reserved : product.available;
     if (available <= 0) { toast.error("Sorry, this piece is sold out"); return false; }
-    const entry = { product_id: product.id, variant_id: variant?.id || null, name: product.name, slug: product.slug, image_url: product.image_url, variant_name: variant?.name || null, price: variant?.price != null ? (variant.sale_price ?? variant.price) : (variant?.sale_price ?? product.effective_price), max: available };
+    const entry = { product_id: product.id, variant_id: variant?.id || null, name: product.name, slug: product.slug, image_url: product.image_url, variant_name: variant?.name || null, price: Number(variant?.price != null ? (variant.sale_price ?? variant.price) : (variant?.sale_price ?? product.effective_price)) + geoExtra(), max: available };
     setItems((prev) => {
       const ex = prev.find((i) => key(i) === key(entry));
       const nextQty = Math.min((ex?.quantity || 0) + qty, available, 20);

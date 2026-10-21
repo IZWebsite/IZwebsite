@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Minus, Plus, X } from "lucide-react";
 import { supabase, errMsg } from "../lib/supabase";
+import { useGeo } from "../lib/geo";
 import { useShop } from "../context/ShopContext";
 import { useSeo } from "../lib/seo";
 import { inr } from "../lib/format";
@@ -10,7 +11,7 @@ import { Empty, Spinner } from "../components/Bits";
 export function useQuote(items, coupon, email) {
   const [q, setQ] = useState(null);
   const [err, setErr] = useState(null);
-  const sig = JSON.stringify(items.map((i) => [i.product_id, i.variant_id, i.quantity])) + coupon + email;
+  const sig = JSON.stringify(items.map((i) => [i.product_id, i.variant_id, i.quantity])) + coupon + email + useGeo().extra;
   useEffect(() => {
     if (!items.length) { setQ(null); return; }
     const t = setTimeout(async () => {

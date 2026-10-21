@@ -33,7 +33,7 @@ netlify.toml              build, SPA fallback, redirects, security headers, sche
 | analyst | view (dashboards only) |
 
 ## 1. Supabase setup
-1. Supabase → **SQL Editor**. Paste and run, in this order: `supabase/migrations/0001_schema.sql`, then `0002_logic.sql`, then `0003_seed.sql`.
+1. Supabase → **SQL Editor**. Paste and run, in this order: `supabase/migrations/0001_schema.sql`, then `0002_logic.sql`, then `0003_seed.sql`, then `0004_location_pricing.sql` (re-run 0004 whenever you re-run 0002).
 2. Authentication → URL configuration: set **Site URL** to your domain. Add `https://YOUR-SITE.netlify.app/**` and `https://www.yourdomain.com/**` to the redirect URLs.
 3. Authentication → Providers → Email: keep **Confirm email** ON.
 4. Authentication → SMTP: connect Resend SMTP (`smtp.resend.com`, port 465, user `resend`, password = your Resend API key). Supabase's built-in mailer is rate-limited and is only suitable for testing.

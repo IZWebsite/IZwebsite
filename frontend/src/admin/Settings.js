@@ -6,6 +6,7 @@ import { useAuth, can, PERMS } from "../context/AuthContext";
 import { fmtDate } from "../lib/format";
 import { Field } from "../components/Bits";
 import { Card, PageTitle, SettingForm, confirmAction } from "./kit";
+import LocationPricing from "./LocationPricing";
 
 function Integrations() {
   const [s, setS] = useState(null);
@@ -81,6 +82,7 @@ export default function Settings() {
       <SettingForm k="payments" title="Payments" note="Enable online payments only after Razorpay keys show as configured above. COD deducts stock when the order is placed; online orders hold stock for the reservation window until payment is verified." fields={[["cod_enabled", "Cash on Delivery enabled", "bool"], ["razorpay_enabled", "Online payment (Razorpay) enabled", "bool"], ["reservation_minutes", "Hold stock for unpaid online orders (minutes)", "number"], ["cod_max_order", "Max order value for COD (₹, 0 = no limit)", "number"]]} />
       <SettingForm k="shipping" title="Shipping" fields={[["flat_fee", "Flat shipping fee (₹)", "number"], ["free_above", "Free shipping above (₹)", "number"], ["estimate_text", "Delivery estimate text"], ["pincode_prefixes", "Serviceable PIN prefixes (comma separated, blank = all India)"]]} />
       <SettingForm k="tax" title="Tax" note="[Confirm with your accountant] Jewellery GST rate and whether your prices include GST." fields={[["mode", "Prices are", "select", ["inclusive", "exclusive"]], ["rate", "GST rate (%)", "number"], ["label", "Tax label"]]} />
+      <LocationPricing />
       <SettingForm k="policies" title="Returns & cancellation rules" fields={[["return_window_days", "Return window (days after delivery)", "number"], ["cancellation_note", "Cancellation note"]]} />
       <SettingForm k="notifications" title="Notifications" note="Owner alerts: new orders, payment failures, cancellations, return requests, low stock and out-of-stock." fields={[["owner_email", "Owner alert email"], ["owner_whatsapp", "Owner WhatsApp (e.g. +9198…)"], ["owner_email_enabled", "Email alerts to owner", "bool"], ["owner_whatsapp_enabled", "WhatsApp alerts to owner", "bool"], ["customer_email_enabled", "Customer order emails", "bool"], ["customer_whatsapp_enabled", "Customer WhatsApp updates (opted-in only)", "bool"]]} />
       <SettingForm k="analytics" title="Analytics" fields={[["enabled", "First-party analytics enabled", "bool"]]} />

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { PackageOpen } from "lucide-react";
 import { inr, STATUS, statusTone } from "../lib/format";
+import { useGeo } from "../lib/geo";
 
 export const SectionHead = ({ eyebrow, title, action, to }) => (
   <div className="flex items-end justify-between gap-4 md:gap-6 mb-6 md:mb-8 lg:mb-10">
@@ -29,12 +30,17 @@ export const GridSkeleton = ({ n = 8 }) => (
   </div>
 );
 
-export const Price = ({ price, sale, className = "" }) => (
-  <span className={`inline-flex items-baseline gap-2 ${className}`}>
-    <span className="font-medium">{inr(sale ?? price)}</span>
-    {sale != null && Number(sale) < Number(price) && <span className="text-xs text-muted-foreground line-through">{inr(price)}</span>}
-  </span>
-);
+export const Price = ({ price, sale, className = "" }) => {
+  const ex = useGeo().extra || 0;
+  const p = price == null ? price : Number(price) + ex;
+  const s = sale == null ? sale : Number(sale) + ex;
+  return (
+    <span className={`inline-flex items-baseline gap-2 ${className}`} data-testid="price">
+      <span className="font-medium">{inr(s ?? p)}</span>
+      {s != null && s < p && <span className="text-xs text-muted-foreground line-through">{inr(p)}</span>}
+    </span>
+  );
+};
 
 export const StatusBadge = ({ status, testid }) => (
   <span className={`inline-flex px-2.5 py-1 text-[11px] uppercase tracking-wider border ${statusTone(status)}`} data-testid={testid}>{STATUS[status] || status}</span>

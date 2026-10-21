@@ -1,7 +1,17 @@
 import { createClient } from "@supabase/supabase-js";
+import { getGeo } from "./geo";
+
+const geoFetch = (url, opts = {}) => {
+  const c = getGeo().coords;
+  if (!c) return fetch(url, opts);
+  const headers = new Headers(opts.headers);
+  headers.set("x-geo", `${c.lat.toFixed(5)},${c.lng.toFixed(5)}`);
+  return fetch(url, { ...opts, headers });
+};
 
 export const supabase = createClient(process.env.REACT_APP_SUPABASE_URL, process.env.REACT_APP_SUPABASE_ANON_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+  global: { fetch: geoFetch },
 });
 
 export const errMsg = (e) =>

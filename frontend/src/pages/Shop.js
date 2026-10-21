@@ -6,6 +6,7 @@ import { supabase } from "../lib/supabase";
 import { useStore } from "../context/StoreContext";
 import { useSeo } from "../lib/seo";
 import { track } from "../lib/analytics";
+import { geoExtra } from "../lib/geo";
 import ProductCard from "../components/ProductCard";
 import { Empty, GridSkeleton } from "../components/Bits";
 
@@ -79,8 +80,9 @@ export default function Shop() {
       const s = q.replace(/[%,()]/g, " ").trim();
       query = query.or(`name.ilike.%${s}%,sku.ilike.%${s}%,description.ilike.%${s}%,category_name.ilike.%${s}%,tags.cs.{${s.toLowerCase()}}`);
     }
-    if (params.get("min")) query = query.gte("effective_price", Number(params.get("min")));
-    if (params.get("max")) query = query.lte("effective_price", Number(params.get("max")));
+    const ex = geoExtra();
+    if (params.get("min")) query = query.gte("effective_price", Number(params.get("min")) - ex);
+    if (params.get("max")) query = query.lte("effective_price", Number(params.get("max")) - ex);
     if (params.get("instock") === "1") query = query.gt("available", 0);
     const sort = params.get("sort") || "newest";
     query = sort === "price_asc" ? query.order("effective_price") : sort === "price_desc" ? query.order("effective_price", { ascending: false }) : sort === "popular" ? query.order("sold_count", { ascending: false }).order("view_count", { ascending: false }) : query.order("created_at", { ascending: false });

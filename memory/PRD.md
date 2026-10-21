@@ -49,6 +49,14 @@ User choices: Supabase + Netlify; Razorpay ready for test keys (online payment o
 - Section order: late-added marquee/features/tabs (sort_order >= 100) render next to their anchors. "Load sample content" now renumbers sort_order in the DB.
 - Testing agent iteration_4: no overflow at any width. Its 2 defects (nav collision at 1536+, arrows at tablet) are fixed and confirmed by screenshot.
 
+## Update (2026-10-21): location pricing
+- Admin → Settings → "Location pricing" (LocationPricing.js): on/off, store lat/lng ("Use my current location" + map link), nearby radius km, extra ₹ per item. Saved as private store_settings key location_pricing (is_public forced false by trigger).
+- Storefront: LocationGate asks for location on first visit with delivery-check wording (skipped if permission is already granted). The browser's GPS position is sent as the x-geo header on every Supabase request (custom fetch in lib/supabase.js).
+- Server: migration 0004_location_pricing.sql adds _geo_extra() (haversine). Beyond the radius, or location unknown/denied/invalid → +extra. _quote adds it to every unit price, so checkout totals match. price_zone() RPC is used by the client for display. Orders store location_extra + customer_geo.
+- Client display: the Price component, cart line prices, product JSON-LD and the Shop min/max filter all apply the extra.
+- Tests: 16/16 SQL tests pass (new location test: near 899, far/unknown/spoofed 949, order stores extra). Screenshot with mocked RPC: far prices 999→1049, sale 799→849; the gate appears when permission isn't granted.
+- User must run 0004 in Supabase SQL editor. Re-run it after any re-run of 0002.
+
 ## Pending / Backlog
 - P0: The user must run `supabase/setup_all.sql` in the Supabase SQL Editor and create the owner role (README). After that, run end-to-end UI testing on the live Supabase project.
 - P0: Add Netlify env vars (service role, Razorpay test keys, webhook secret, Resend), deploy, and verify.
