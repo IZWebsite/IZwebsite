@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Star } from "lucide-react";
+import { Star, Banknote, Truck, RotateCcw, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { supabase, errMsg } from "../lib/supabase";
 import { useStore } from "../context/StoreContext";
@@ -20,22 +20,56 @@ function Hero() {
     return () => clearInterval(t);
   }, [heroes.length]);
   const h = heroes[i] || { id: "default", title: "Jewellery that carries your story", subtitle: "Premium imitation and anti-tarnish pieces, designed in India for every day and every celebration.", image_url: "/demo/hero.jpg", cta_label: "Shop the collection", cta_url: "/shop" };
+  if (!h.title) return (
+    <section className="relative bg-[#2b2420]" data-testid="home-hero">
+      <Link to={h.cta_url || "/shop"} aria-label={h.cta_label || "Shop the collection"} data-testid="hero-cta-btn"><img key={h.id} src={h.image_url} alt={h.subtitle || "IMINATIONZ jewellery"} className="w-full h-auto block reveal" fetchPriority="high" /></Link>
+      {heroes.length > 1 && <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">{heroes.map((x, n) => <button key={x.id} aria-label={`Slide ${n + 1}`} onClick={() => setI(n)} className={`h-[3px] w-8 rounded-full ${n === i ? "bg-white" : "bg-white/40"}`} />)}</div>}
+    </section>
+  );
   return (
-    <section className="relative grain overflow-hidden" data-testid="home-hero">
-      <div className="grid lg:grid-cols-[1.05fr_1fr] min-h-[78vh]">
-        <div className="order-2 lg:order-1 flex items-center bg-secondary/60">
-          <div className="container-x lg:pl-16 xl:pl-24 py-14 lg:py-0 max-w-2xl reveal" key={h.id}>
-            <p className="eyebrow mb-6">New season · Handpicked in India</p>
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl leading-[1.05] font-normal">{h.title}</h1>
-            {h.subtitle && <p className="mt-6 text-base text-muted-foreground max-w-md leading-relaxed">{h.subtitle}</p>}
-            {h.cta_label && <Link to={h.cta_url || "/shop"} className="btn-primary mt-10 px-9" data-testid="hero-cta-btn">{h.cta_label}</Link>}
-            {heroes.length > 1 && <div className="flex gap-2 mt-10">{heroes.map((x, n) => <button key={x.id} aria-label={`Slide ${n + 1}`} onClick={() => setI(n)} className={`h-[2px] w-10 ${n === i ? "bg-foreground" : "bg-foreground/20"}`} />)}</div>}
+    <section className="relative overflow-hidden bg-[#2b2420]" data-testid="home-hero">
+      <div className="relative h-[72vh] md:h-[84vh] min-h-[480px]">
+        <img key={h.id} src={h.image_url || "/demo/hero.jpg"} alt={h.title || "IMINATIONZ jewellery"} className="absolute inset-0 w-full h-full object-cover reveal" fetchPriority="high" />
+        <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/65 via-black/25 to-transparent" />
+        <div className="relative h-full container-x flex flex-col justify-end md:justify-center pb-14 md:pb-0">
+          <div className="max-w-xl text-white reveal" key={h.id}>
+            <p className="text-[11px] uppercase tracking-[0.34em] text-[color:var(--champagne)] mb-5 flex items-center gap-3">IMINATIONZ<span className="h-px w-10 bg-[color:var(--gold)]" /></p>
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-7xl leading-[1.02] font-normal">{h.title}</h1>
+            {h.subtitle && <p className="mt-5 text-sm md:text-base text-white/80 max-w-md leading-relaxed">{h.subtitle}</p>}
+            {h.cta_label && <Link to={h.cta_url || "/shop"} className="inline-flex items-center mt-9 h-12 px-9 rounded-full border border-white/50 bg-white/10 backdrop-blur-md text-xs uppercase tracking-[0.24em] hover:bg-white hover:text-foreground transition-colors" data-testid="hero-cta-btn">{h.cta_label}</Link>}
           </div>
-        </div>
-        <div className="order-1 lg:order-2 relative min-h-[52vh] lg:min-h-0">
-          <img src={h.image_url || "/demo/hero.jpg"} alt={h.title || "IMINATIONZ jewellery"} className="absolute inset-0 w-full h-full object-cover" fetchPriority="high" />
+          {heroes.length > 1 && <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">{heroes.map((x, n) => <button key={x.id} aria-label={`Slide ${n + 1}`} onClick={() => setI(n)} className={`h-[3px] w-8 rounded-full transition-colors ${n === i ? "bg-white" : "bg-white/35"}`} />)}</div>}
         </div>
       </div>
+    </section>
+  );
+}
+
+function Marquee({ s }) {
+  const { settings } = useStore();
+  const items = (s.body ? s.body.split("\n") : [`Free shipping on orders above ₹${settings.shipping?.free_above ?? 999}`, "Cash on delivery available", `${settings.policies?.return_window_days ?? 7}-day easy returns`, "Anti-tarnish collection now live", "Designed in India"]).map((x) => x.trim()).filter(Boolean);
+  return (
+    <div className="bg-[#2b2420] text-[#efe6d8] overflow-hidden py-3.5 border-t border-white/10" data-testid="home-section-marquee">
+      <div className="flex w-max animate-marquee">{[0, 1].map((r) => (
+        <div key={r} className="flex shrink-0" aria-hidden={r === 1}>{items.map((t, i) => <span key={i} className="px-10 text-[11px] md:text-xs uppercase tracking-[0.22em] whitespace-nowrap flex items-center gap-10">{t}<span className="text-[color:var(--gold)]">✦</span></span>)}</div>
+      ))}</div>
+    </div>
+  );
+}
+
+const FEAT_ICONS = [Banknote, Truck, RotateCcw, Sparkles];
+function Features({ s }) {
+  const { settings } = useStore();
+  const items = (s.body ? s.body.split("\n").filter((x) => x.trim()).map((x) => x.split("|").map((y) => y.trim())) : [
+    ["Cash on Delivery", "Pay when your order arrives"], ["Free Shipping", `On orders above ₹${settings.shipping?.free_above ?? 999}`],
+    [`${settings.policies?.return_window_days ?? 7}-Day Returns`, "Easy returns & exchange"], ["Anti-Tarnish", "Everyday shine that lasts"],
+  ]).slice(0, 4);
+  return (
+    <section className="border-y bg-card" data-testid="home-section-features">
+      <div className="container-x grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6 py-8">{items.map(([t, d], i) => {
+        const I = FEAT_ICONS[i % 4];
+        return <div key={i} className="flex items-start gap-3"><I size={26} strokeWidth={1.3} className="text-[color:var(--gold)] shrink-0" /><div><p className="text-sm font-medium">{t}</p>{d && <p className="text-xs text-muted-foreground mt-0.5">{d}</p>}</div></div>;
+      })}</div>
     </section>
   );
 }
@@ -45,7 +79,8 @@ const Row = ({ s, items, loading }) => {
   return (
     <section className="container-x py-16 md:py-20" data-testid={`home-section-${s.section_key}`}>
       <SectionHead eyebrow={s.subtitle} title={s.title} action={s.cta_label} to={s.cta_url} />
-      {loading ? <GridSkeleton n={4} /> : <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-10">{items.slice(0, 8).map((p, n) => <ProductCard key={p.id} product={p} index={n} />)}</div>}
+      {loading ? <GridSkeleton n={4} /> : <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 md:gap-x-5 gap-y-10">{items.slice(0, 8).map((p, n) => <ProductCard key={p.id} product={p} index={n} />)}</div>}
+      {s.cta_label && s.cta_url && <div className="text-center mt-10 md:hidden"><Link to={s.cta_url} className="btn-primary rounded-md px-8">{s.cta_label}</Link></div>}
     </section>
   );
 };
@@ -55,13 +90,14 @@ function Categories({ s }) {
   const list = categories.filter((c) => c.is_featured && c.is_visible).slice(0, 6);
   if (!list.length) return null;
   return (
-    <section className="container-x py-16 md:py-24" data-testid="home-section-categories">
-      <SectionHead eyebrow={s.subtitle} title={s.title} action="All categories" to="/shop" />
-      <div className="flex md:grid md:grid-cols-6 gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
-        {list.map((c) => (
-          <Link key={c.id} to={`/shop?category=${c.slug}`} className="group shrink-0 w-[38vw] md:w-auto" data-testid={`category-tile-${c.slug}`}>
-            <div className="aspect-[3/4] overflow-hidden bg-muted"><img src={c.image_url || "/demo/set.jpg"} alt={c.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" /></div>
-            <p className="font-display text-xl mt-3 text-center">{c.name}</p>
+    <section className="container-x pt-12 md:pt-16 pb-6" data-testid="home-section-categories">
+      {s.title && <SectionHead eyebrow={s.subtitle} title={s.title} action="All categories" to="/shop" />}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
+        {list.map((c, n) => (
+          <Link key={c.id} to={`/shop?category=${c.slug}`} className="group relative block overflow-hidden rounded-xl bg-muted aspect-[4/5] md:aspect-[4/3]" data-testid={`category-tile-${c.slug}`}>
+            <img src={c.image_url || CAT_FALLBACK[n % CAT_FALLBACK.length]} alt={c.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
+            <span className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/45 backdrop-blur-md text-white px-5 md:px-7 h-9 md:h-11 inline-flex items-center text-[11px] md:text-xs uppercase tracking-[0.2em] whitespace-nowrap group-hover:bg-white group-hover:text-foreground transition-colors">{c.name}</span>
           </Link>
         ))}
       </div>
@@ -86,14 +122,33 @@ function Promo() {
   );
 }
 
-function Offer({ s }) {
+const CAT_FALLBACK = ["/demo/jhumka.jpg", "/demo/necklace.jpg", "/demo/rings.jpg", "/demo/bracelet.jpg", "/demo/set.jpg", "/demo/chain.jpg"];
+
+function Offer({ s, items }) {
   if (!s.title && !s.body) return null;
   return (
-    <section className="bg-[color:var(--champagne)]/50 py-14 my-6" data-testid="home-section-offer">
-      <div className="container-x flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div><p className="eyebrow mb-2">{s.subtitle}</p><h2 className="font-display text-3xl md:text-4xl">{s.title}</h2>{s.body && <p className="mt-2 text-sm text-muted-foreground">{s.body}</p>}</div>
-        {s.cta_label && <Link to={s.cta_url || "/shop"} className="btn-outline">{s.cta_label}</Link>}
+    <section className="container-x py-14 md:py-20" data-testid="home-section-offer">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-10">
+        <div>{s.body && <p className="text-sm md:text-base text-muted-foreground mb-3">{s.body}</p>}<h2 className="font-display text-4xl md:text-5xl">{s.title}</h2>{s.subtitle && <p className="eyebrow mt-3">{s.subtitle}</p>}</div>
+        {s.cta_label && <Link to={s.cta_url || "/shop"} className="btn-primary rounded-md px-8 self-start md:self-auto" data-testid="offer-cta-btn">{s.cta_label}</Link>}
       </div>
+      {items.length > 0 && <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 md:gap-x-5 gap-y-10">{items.slice(0, 4).map((p, n) => <ProductCard key={p.id} product={p} index={n} />)}</div>}
+    </section>
+  );
+}
+
+function Tabs({ s, p }) {
+  const tabs = [["Festive", p.filter((x) => x.is_festive)], ["Anti-Tarnish", p.filter((x) => x.is_anti_tarnish)], ["Trending", p.filter((x) => x.is_trending)], ["On Sale", p.filter((x) => x.sale_price != null)]].filter(([, l]) => l.length);
+  const [t, setT] = useState(0);
+  if (!tabs.length) return null;
+  const cur = tabs[Math.min(t, tabs.length - 1)];
+  return (
+    <section className="container-x py-14 md:py-20" data-testid="home-section-tabs">
+      <h2 className="font-display text-4xl md:text-5xl text-center">{s.title || "Shop by Mood"}</h2>
+      <div className="flex justify-center gap-6 md:gap-10 mt-6 mb-10 overflow-x-auto no-scrollbar">{tabs.map(([l], i) => (
+        <button key={l} onClick={() => setT(i)} className={`pb-2 text-sm md:text-base whitespace-nowrap border-b-2 transition-colors ${cur[0] === l ? "border-[color:var(--gold)] text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`} data-testid={`home-tab-${l.toLowerCase().replace(/\s+/g, "-")}`}>{l}</button>
+      ))}</div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 md:gap-x-5 gap-y-10">{cur[1].slice(0, 8).map((x, n) => <ProductCard key={x.id} product={x} index={n} />)}</div>
     </section>
   );
 }
@@ -176,7 +231,10 @@ export default function Home() {
         if (k === "hero") return <Hero key={k} />;
         if (k === "categories") return <Categories key={k} s={s} />;
         if (k === "promo") return <Promo key={k} />;
-        if (k === "offer") return <Offer key={k} s={s} />;
+        if (k === "offer") return <Offer key={k} s={s} items={p.filter((x) => x.sale_price != null)} />;
+        if (k === "marquee") return <Marquee key={k} s={s} />;
+        if (k === "features") return <Features key={k} s={s} />;
+        if (k === "tabs") return <Tabs key={k} s={s} p={p} />;
         if (k === "testimonials") return <Testimonials key={k} s={s} />;
         if (k === "story") return <Story key={k} s={s} />;
         if (k === "care") return <Care key={k} s={s} />;

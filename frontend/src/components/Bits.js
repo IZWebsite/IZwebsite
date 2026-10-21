@@ -5,10 +5,10 @@ import { inr, STATUS, statusTone } from "../lib/format";
 export const SectionHead = ({ eyebrow, title, action, to }) => (
   <div className="flex items-end justify-between gap-6 mb-8 md:mb-10">
     <div>
-      {eyebrow && <p className="eyebrow mb-2">{eyebrow}</p>}
-      <h2 className="font-display text-3xl md:text-4xl leading-tight">{title}</h2>
+      {eyebrow && <p className="text-sm text-muted-foreground mb-2">{eyebrow}</p>}
+      <h2 className="font-display text-4xl md:text-5xl leading-tight">{title}</h2>
     </div>
-    {action && to && <Link to={to} className="text-sm link-u whitespace-nowrap" data-testid={`section-link-${title?.toLowerCase().replace(/\s+/g, "-")}`}>{action} →</Link>}
+    {action && to && <Link to={to} className="hidden md:inline-flex btn-primary rounded-md h-10 px-7 whitespace-nowrap" data-testid={`section-link-${title?.toLowerCase().replace(/\s+/g, "-")}`}>{action}</Link>}
   </div>
 );
 

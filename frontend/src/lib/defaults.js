@@ -24,11 +24,12 @@ export const DEFAULT_SETTINGS = {
 };
 
 export const DEFAULT_SECTIONS = [
-  ["hero", "Hero banner"], ["categories", "Featured categories", "Shop by Category", "Find the piece that feels like you"],
+  ["hero", "Hero banner"], ["marquee", "Scrolling offer strip (one message per line in Body)"],
+  ["categories", "Featured categories"], ["features", "Trust highlights (Body: Title | text, one per line)"],
+  ["bestsellers", "Bestsellers", "Bestsellers", "Our most-loved pieces", "View all", "/shop?sort=popular"],
+  ["offer", "Offer band", null, null, "Shop the offer", "/shop?collection=sale"],
   ["new_arrivals", "New arrivals", "New Arrivals", "Freshly crafted, just landed", "View all", "/shop?sort=newest"],
-  ["offer", "Coupon / offer", null, null], ["bestsellers", "Bestsellers", "Bestsellers", "Loved and re-ordered", "View all", "/shop?sort=popular"],
-  ["promo", "Promotional banners"], ["trending", "Trending", "Trending Now", "What everyone is wearing this week"],
-  ["festive", "Festive collection", "The Festive Edit", "Statement pieces for celebrations", "Explore", "/shop?collection=festive"],
+  ["tabs", "Tabbed collections", "Shop by Mood"], ["promo", "Promotional banners"],
   ["recently_viewed", "Recently viewed", "Recently Viewed"], ["testimonials", "Customer reviews", "From Our Customers"],
   ["story", "Brand story", "Wear elegance. Share Kindness", "Our story", "Read our story", "/pages/about", "[Your brand story — a few lines on how IMINATIONZ began.]", "/demo/story.jpg"],
   ["care", "Jewellery care", "Caring for your jewellery", null, "Care guide", "/pages/care", "Keep away from water and perfume · Wipe with a soft cloth · Store in an airtight pouch"],

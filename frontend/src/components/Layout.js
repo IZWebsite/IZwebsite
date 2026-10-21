@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Heart, Menu, Search, ShoppingBag, User, X, Instagram, Facebook, Youtube, MessageCircle, Minus, Plus } from "lucide-react";
+import { Heart, Menu, Search, ShoppingBag, User, X, Instagram, Facebook, Youtube, MessageCircle, Minus, Plus, Home, LayoutGrid, ArrowUp } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle } from "./ui/sheet";
 import { useStore } from "../context/StoreContext";
 import { useShop } from "../context/ShopContext";
@@ -28,7 +28,7 @@ function Announcement() {
   );
 }
 
-const NAV = [["Shop all", "/shop"], ["Earrings", "/shop?category=earrings"], ["Necklaces", "/shop?category=necklaces"], ["Anti-Tarnish", "/shop?collection=anti-tarnish"], ["New In", "/shop?sort=newest"]];
+const NAV = [["Shop all", "/shop"], ["New In", "/shop?sort=newest"], ["Bestsellers", "/shop?sort=popular"], ["Earrings", "/shop?category=earrings"], ["Necklaces", "/shop?category=necklaces"], ["Anti-Tarnish", "/shop?collection=anti-tarnish"], ["Festive", "/shop?collection=festive"]];
 
 function Header() {
   const { count, setCartOpen } = useShop();
@@ -38,18 +38,25 @@ function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const nav = useNavigate();
   const submit = (e) => { e.preventDefault(); if (q.trim()) { nav(`/shop?q=${encodeURIComponent(q.trim())}`); setSearchOpen(false); setOpen(false); } };
+  useEffect(() => {
+    const h = () => { setSearchOpen(true); window.scrollTo({ top: 0, behavior: "smooth" }); };
+    window.addEventListener("imz:search", h);
+    return () => window.removeEventListener("imz:search", h);
+  }, []);
   return (
-    <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-md border-b border-border">
-      <div className="container-x h-16 md:h-20 flex items-center justify-between gap-4">
-        <button className="lg:hidden p-2 -ml-2" onClick={() => setOpen(true)} aria-label="Open menu" data-testid="mobile-menu-btn"><Menu size={20} /></button>
-        <Link to="/" data-testid="header-logo" className="lg:mr-10"><Logo /></Link>
-        <nav className="hidden lg:flex items-center gap-8 text-[13px] tracking-[0.08em] flex-1">
-          {NAV.map(([l, to]) => <NavLink key={l} to={to} className="hover:text-[color:var(--gold)] transition-colors" data-testid={`nav-${l.toLowerCase().replace(/\s+/g, "-")}`}>{l}</NavLink>)}
-        </nav>
-        <div className="flex items-center gap-1 md:gap-2">
+    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
+      <div className="container-x h-16 md:h-20 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+        <div className="flex items-center min-w-0">
+          <button className="lg:hidden p-2 -ml-2" onClick={() => setOpen(true)} aria-label="Open menu" data-testid="mobile-menu-btn"><Menu size={22} strokeWidth={1.5} /></button>
+          <nav className="hidden lg:flex flex-wrap items-center gap-x-6 gap-y-1 text-[14px]">
+            {NAV.map(([l, to]) => <NavLink key={l} to={to} className="hover:text-[color:var(--gold)] transition-colors whitespace-nowrap" data-testid={`nav-${l.toLowerCase().replace(/\s+/g, "-")}`}>{l}</NavLink>)}
+          </nav>
+        </div>
+        <Link to="/" data-testid="header-logo" className="justify-self-center"><Logo /></Link>
+        <div className="flex items-center justify-end gap-0.5 md:gap-2">
           <button className="p-2" onClick={() => setSearchOpen((v) => !v)} aria-label="Search" data-testid="header-search-btn"><Search size={19} strokeWidth={1.5} /></button>
           <Link to="/account?tab=wishlist" className="p-2 hidden sm:block" aria-label="Wishlist" data-testid="header-wishlist-link"><Heart size={19} strokeWidth={1.5} /></Link>
-          <Link to={user ? "/account" : "/login"} className="p-2" aria-label="Account" data-testid="header-account-link"><User size={19} strokeWidth={1.5} /></Link>
+          <Link to={user ? "/account" : "/login"} className="p-2 hidden sm:block" aria-label="Account" data-testid="header-account-link"><User size={19} strokeWidth={1.5} /></Link>
           <button className="p-2 relative" onClick={() => setCartOpen(true)} aria-label="Bag" data-testid="header-cart-btn">
             <ShoppingBag size={19} strokeWidth={1.5} />
             {count > 0 && <span className="absolute -top-0.5 -right-0.5 h-[18px] min-w-[18px] px-1 text-[10px] bg-[color:var(--gold)] text-white rounded-full grid place-items-center" data-testid="cart-count">{count}</span>}
@@ -146,7 +153,7 @@ function WhatsAppFloat() {
   if (!n) return null;
   return (
     <a href={`https://wa.me/${n}?text=${encodeURIComponent("Hi IMINATIONZ, I have a question")}`} target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp"
-      className="fixed bottom-5 right-5 z-40 h-13 w-13 p-3.5 rounded-full bg-[#25D366] text-white shadow-lg hover:scale-105 transition-transform" data-testid="whatsapp-float-btn">
+      className="fixed bottom-36 lg:bottom-20 right-4 lg:right-5 z-40 p-3.5 rounded-full bg-[#25D366] text-white shadow-lg hover:scale-105 transition-transform" data-testid="whatsapp-float-btn">
       <MessageCircle size={24} />
     </a>
   );
@@ -157,13 +164,39 @@ function ConsentBanner() {
   if (!show) return null;
   const pick = (v) => { setConsent(v); setShow(false); };
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 bg-card border-t p-4 md:p-5 reveal" data-testid="consent-banner">
+    <div className="fixed bottom-16 lg:bottom-0 inset-x-0 z-50 bg-card border-t p-4 md:p-5 reveal" data-testid="consent-banner">
       <div className="container-x flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
         <p className="text-sm flex-1">We use first-party analytics (no ads, no third-party trackers) to understand which pieces you love. <Link to="/pages/privacy" className="link-u">Privacy policy</Link></p>
         <div className="flex gap-2"><button className="btn-outline h-9" onClick={() => pick("denied")} data-testid="consent-decline-btn">Decline</button><button className="btn-primary h-9" onClick={() => pick("granted")} data-testid="consent-accept-btn">Accept</button></div>
       </div>
     </div>
   );
+}
+
+function BottomNav() {
+  const { count, setCartOpen } = useShop();
+  const { user } = useAuth();
+  const cls = "flex-1 flex flex-col items-center justify-center gap-0.5 text-[10px] uppercase tracking-wider";
+  return (
+    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-background/95 backdrop-blur-md border-t flex divide-x" data-testid="mobile-bottom-nav">
+      <NavLink to="/" end className={cls} data-testid="bottom-nav-home"><Home size={19} strokeWidth={1.5} />Home</NavLink>
+      <NavLink to="/shop" className={cls} data-testid="bottom-nav-shop"><LayoutGrid size={19} strokeWidth={1.5} />Shop</NavLink>
+      <button className={`${cls} relative`} onClick={() => setCartOpen(true)} data-testid="bottom-nav-cart"><ShoppingBag size={19} strokeWidth={1.5} />Bag{count > 0 && <span className="absolute top-2 left-1/2 ml-2 h-4 min-w-4 px-1 text-[9px] bg-[color:var(--gold)] text-white rounded-full grid place-items-center">{count}</span>}</button>
+      <button className={cls} onClick={() => window.dispatchEvent(new Event("imz:search"))} data-testid="bottom-nav-search"><Search size={19} strokeWidth={1.5} />Search</button>
+      <NavLink to={user ? "/account" : "/login"} className={cls} data-testid="bottom-nav-account"><User size={19} strokeWidth={1.5} />Account</NavLink>
+    </nav>
+  );
+}
+
+function BackToTop() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const h = () => setShow(window.scrollY > 700);
+    window.addEventListener("scroll", h, { passive: true });
+    return () => window.removeEventListener("scroll", h);
+  }, []);
+  if (!show) return null;
+  return <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top" className="fixed bottom-20 lg:bottom-5 right-4 lg:right-5 z-40 h-12 w-12 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-lg hover:bg-[color:var(--gold)] transition-colors reveal" data-testid="back-to-top-btn"><ArrowUp size={18} /></button>;
 }
 
 function SetupNotice() {
@@ -184,7 +217,7 @@ export default function Layout() {
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   const maint = settings.maintenance?.enabled && !isStaff;
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pb-16 lg:pb-0">
       <Announcement />
       <Header />
       <main className="flex-1">
@@ -195,6 +228,8 @@ export default function Layout() {
       <Footer />
       <CartDrawer />
       <WhatsAppFloat />
+      <BackToTop />
+      <BottomNav />
       <ConsentBanner />
     </div>
   );

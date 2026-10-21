@@ -64,7 +64,7 @@ function Banners() {
     <Card title="Banners" action={<div className="flex gap-2"><button className="btn-outline h-10" onClick={() => setRows([...rows, { placement: "hero", title: "", subtitle: "", image_url: "", cta_label: "Shop now", cta_url: "/shop", sort_order: rows.length, is_active: true }])} data-testid="add-hero-banner-btn">+ Hero</button><button className="btn-outline h-10" onClick={() => setRows([...rows, { placement: "promo", title: "", subtitle: "", image_url: "", cta_label: "Shop now", cta_url: "/shop", sort_order: rows.length, is_active: true }])} data-testid="add-promo-banner-btn">+ Promo</button></div>}>
       <div className="space-y-4">{rows.map((b, i) => (
         <div key={b.id || i} className="grid sm:grid-cols-2 gap-3 p-4 border" data-testid="banner-row">
-          <p className="sm:col-span-2 text-xs uppercase tracking-wider text-muted-foreground">{b.placement} banner</p>
+          <p className="sm:col-span-2 text-xs uppercase tracking-wider text-muted-foreground">{b.placement} banner{b.placement === "hero" && " · leave Heading empty if your image already contains its own text — it will show as a full clickable image"}</p>
           <Field label="Heading"><input className="input" value={b.title || ""} onChange={(e) => upd(i, "title", e.target.value)} /></Field>
           <Field label="Description"><input className="input" value={b.subtitle || ""} onChange={(e) => upd(i, "subtitle", e.target.value)} /></Field>
           <Field label="Button label"><input className="input" value={b.cta_label || ""} onChange={(e) => upd(i, "cta_label", e.target.value)} /></Field>

@@ -52,7 +52,7 @@ export default function ProductCard({ product, index = 0 }) {
   const low = !sold && product.available <= product.low_stock_threshold;
   return (
     <div className="group reveal" style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }} data-testid={`product-card-${product.slug}`}>
-      <div className="relative overflow-hidden bg-muted aspect-[4/5]">
+      <div className="relative overflow-hidden bg-muted aspect-[4/5] rounded-lg">
         <Link to={`/product/${product.slug}`} aria-label={product.name}>
           <img src={product.image_url || "/demo/set.jpg"} alt={product.name} loading="lazy" decoding="async"
             className={`absolute inset-0 w-full h-full object-cover transition-[transform,opacity] duration-700 group-hover:scale-[1.04] ${sold ? "opacity-60 grayscale-[30%]" : ""}`} />
