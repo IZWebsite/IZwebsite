@@ -1,0 +1,27 @@
+{
+  "summary": "Frontend-only check of the Admin → Settings 'Location pricing' card on the PREVIEW URL. I reached /admin/settings by injecting a fake supabase-js v2 session into localStorage (sb-hobnqsrmafcnixbmiqfp-auth-token) and mocking Supabase in Playwright: auth/v1/user returned a user, rpc/my_role returned 'owner', and profiles returned a fake profile. store_settings, categories, homepage_content and banners were passed through to the real Supabase as GET requests with the anon key. Every write was blocked. The card renders and works. It sits between Tax and Returns & cancellation rules, as requested. All 7 controls are visible. Typing 50 in the extra field shows 'Example: ₹999 → ₹1049, sale ₹799 → ₹849 for shoppers beyond 10 km.' With geolocation granted, 'Use my current location' filled lat 12.971599 and lng 77.594566, then showed the 'Check on map' link and the toast 'Store location set — press Save'. Checking 'Location pricing on' with an empty latitude and pressing Save showed the toast 'Set your store location first', so no request was sent. The shopper location popup (location-gate) does not appear on /admin. On the preview, the user's report 'Cant see location on setting' does not happen. The likely cause is that the live Netlify bundle is older than this feature, as E1 already found.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Admin Settings > Location pricing", "issues": ["The 'Use my current location' button has the btn-outline class but shows as a dark filled button, so it carries as much visual weight as Save. Minor."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Redeploy the current code to Netlify (izlive.netlify.app). The live bundle does not contain the location feature, which is why the user cannot see it.",
+    "Make sure supabase/migrations/0004_location_pricing.sql (the location_pricing setting row, the price_zone RPC and the trigger) has been run on the live Supabase. Saving and the shopper-side pricing will fail without it."
+  ],
+  "critical_code_review_comments": [
+    "LocationPricing (and SettingForm) set their starting form values from settings with useState only once, when the card first mounts. If StoreContext loads settings after Settings has mounted, saved values (lat, lng, radius, extra) will not appear in the form. A save then sends the defaults and can overwrite the real values. Re-sync when settings.location_pricing changes (useEffect, or a key on settings readiness).",
+    "The form keeps radius and extra as numbers, but a cleared field becomes '' and is saved as an empty string when location pricing is off. Consider normalising before upsert."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "100%"},
+  "test_credentials": "No owner credentials (/app/memory/test_credentials.md says no accounts exist). Owner access was mocked in the browser only.",
+  "seed_data_creation": "None. Nothing was written to Supabase; all non-GET requests were blocked.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "To reach /admin pages: grant geolocation, set localStorage 'sb-hobnqsrmafcnixbmiqfp-auth-token' to a fake session, and route **/hobnqsrmafcnixbmiqfp.supabase.co/** returning user, my_role='owner' and a profile. Pass store_settings GET through with Authorization: Bearer <anon key> and block writes. After the fake login the app also sent DELETE cart_items?user_id=eq.<id>; it was blocked."
+}
