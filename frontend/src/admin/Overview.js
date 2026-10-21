@@ -4,6 +4,8 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianG
 import { supabase, errMsg } from "../lib/supabase";
 import { inr } from "../lib/format";
 import { Card, PageTitle, Stat } from "./kit";
+import SetupDefaults from "./SetupDefaults";
+import { useAuth } from "../context/AuthContext";
 
 export function useRange() {
   const [preset, setPreset] = useState("30");
@@ -40,6 +42,7 @@ export default function Overview() {
   const [d, setD] = useState(null);
   const [err, setErr] = useState(null);
   const [by, setBy] = useState("day");
+  const { role } = useAuth();
   useEffect(() => {
     supabase.rpc("admin_dashboard", { p_from: range.from.toISOString(), p_to: range.to.toISOString() }).then(({ data, error }) => { if (error) setErr(errMsg(error)); else setD(data); });
   }, [range]);
@@ -49,6 +52,7 @@ export default function Overview() {
   return (
     <div className="space-y-6" data-testid="admin-overview">
       <PageTitle title="Overview">{picker}</PageTitle>
+      {role === "owner" && <SetupDefaults />}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Stat label="Today's orders" value={d.today_orders} hint={inr(d.today_sales)} testid="stat-today-orders" />
         <Link to="/admin/orders?status=confirmed"><Stat label="Awaiting processing" value={d.awaiting_processing} testid="stat-awaiting" /></Link>

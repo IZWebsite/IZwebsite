@@ -8,6 +8,7 @@ import { useSeo } from "../lib/seo";
 import { getRecent } from "../lib/format";
 import ProductCard from "../components/ProductCard";
 import { SectionHead, GridSkeleton } from "../components/Bits";
+import { DEFAULT_SECTIONS } from "../lib/defaults";
 
 function Hero() {
   const { banners } = useStore();
@@ -18,8 +19,7 @@ function Hero() {
     const t = setInterval(() => setI((x) => (x + 1) % heroes.length), 6000);
     return () => clearInterval(t);
   }, [heroes.length]);
-  const h = heroes[i];
-  if (!h) return null;
+  const h = heroes[i] || { id: "default", title: "Jewellery that carries your story", subtitle: "Premium imitation and anti-tarnish pieces, designed in India for every day and every celebration.", image_url: "/demo/hero.jpg", cta_label: "Shop the collection", cta_url: "/shop" };
   return (
     <section className="relative grain overflow-hidden" data-testid="home-hero">
       <div className="grid lg:grid-cols-[1.05fr_1fr] min-h-[78vh]">
@@ -171,7 +171,7 @@ export default function Home() {
   };
   return (
     <div data-testid="home-page">
-      {sections.filter((s) => s.is_visible).map((s) => {
+      {(sections.length ? sections : DEFAULT_SECTIONS).filter((s) => s.is_visible).map((s) => {
         const k = s.section_key;
         if (k === "hero") return <Hero key={k} />;
         if (k === "categories") return <Categories key={k} s={s} />;
