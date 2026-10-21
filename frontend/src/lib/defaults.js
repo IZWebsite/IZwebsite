@@ -36,4 +36,33 @@ export const DEFAULT_SECTIONS = [
   ["newsletter", "Newsletter", "Join the IMINATIONZ circle", "New launches and offers, a few times a month. Unsubscribe anytime."],
 ].map(([section_key, label, title = null, subtitle = null, cta_label = null, cta_url = null, body = null, image_url = null], i) => ({ section_key, label, title, subtitle, cta_label, cta_url, body, image_url, sort_order: i + 1, is_visible: true }));
 
+export const SAMPLE_SECTION_TEXT = {
+  bestsellers: { title: "Bestsellers", subtitle: "Our most-loved pieces", cta_label: "View all", cta_url: "/shop?sort=popular" },
+  new_arrivals: { title: "New Arrivals", subtitle: "Freshly crafted, just landed", cta_label: "View all", cta_url: "/shop?sort=newest" },
+  trending: { title: "Trending Now", subtitle: "What everyone is wearing", cta_label: "View all", cta_url: "/shop" },
+  festive: { title: "Festive Edit", subtitle: "Shine at every celebration", cta_label: "View all", cta_url: "/shop" },
+  categories: { title: "Shop by Category", subtitle: "Find your style" },
+  offer: { title: "Festive Sale — Up to 30% Off", subtitle: "Limited time only", body: "Handpicked pieces at special prices", cta_label: "Shop the offer", cta_url: "/shop?collection=sale" },
+  marquee: { body: "Free shipping on orders above ₹999\nCash on delivery available\n7-day easy returns\nAnti-tarnish collection now live\nDesigned in India" },
+  features: { body: "Cash on Delivery | Pay when your order arrives\nFree Shipping | On orders above ₹999\n7-Day Returns | Easy returns & exchange\nAnti-Tarnish | Everyday shine that lasts" },
+  tabs: { title: "Shop by Mood" },
+  recently_viewed: { title: "Recently Viewed" },
+  testimonials: { title: "From Our Customers", body: "[Sample] Priya S. | Beautiful jhumkas, exactly like the photos. Got so many compliments!\n[Sample] Ananya R. | The anti-tarnish ring still shines after weeks of daily wear.\n[Sample] Meera K. | Lovely packaging and quick delivery. Will order again." },
+  story: { title: "Wear elegance. Share Kindness", subtitle: "Our story", body: "[Your brand story — a few lines on how IMINATIONZ began.]", cta_label: "Read our story", cta_url: "/pages/about", image_url: "/demo/story.jpg" },
+  care: { title: "Caring for your jewellery", body: "Keep away from water and perfume · Wipe with a soft cloth · Store in an airtight pouch", cta_label: "Care guide", cta_url: "/pages/care" },
+  newsletter: { title: "Join the IMINATIONZ circle", subtitle: "New launches and offers, a few times a month. Unsubscribe anytime." },
+};
+
+// [name, sku, category slug, price, sale price, stock, image, flags]
+export const SAMPLE_PRODUCTS = [
+  ["Kundan Pearl Jhumka", "SAMPLE-01", "earrings", 1299, 899, 5, "/demo/jhumka.jpg", "is_featured,is_new,is_bestseller,is_festive"],
+  ["Minimal Gold Studs", "SAMPLE-02", "earrings", 599, null, 12, "/demo/studs.jpg", "is_new,is_trending,is_anti_tarnish"],
+  ["Stackable Ring Trio", "SAMPLE-03", "rings", 799, 649, 8, "/demo/rings.jpg", "is_bestseller,is_trending,is_anti_tarnish"],
+  ["Coin Charm Chain", "SAMPLE-04", "chains", 999, null, 6, "/demo/chain.jpg", "is_new,is_trending,is_anti_tarnish"],
+  ["Twisted Cuff Bracelet", "SAMPLE-05", "bracelets", 1099, 949, 6, "/demo/bracelet.jpg", "is_bestseller,is_anti_tarnish"],
+  ["Layered Festive Necklace", "SAMPLE-06", "necklaces", 1899, 1499, 4, "/demo/necklace.jpg", "is_new,is_trending,is_festive"],
+  ["Everyday Jewellery Set", "SAMPLE-07", "pendants", 2199, 1799, 7, "/demo/set.jpg", "is_bestseller,is_festive"],
+  ["Pearl Drop Pendant", "SAMPLE-08", "pendants", 899, null, 9, "/demo/necklace.jpg", "is_new,is_bestseller,is_festive"],
+];
+
 export const DEFAULT_CATEGORIES = ["Earrings", "Jhumkas", "Studs", "Baliyan", "Rings", "Bangles", "Bracelets", "Pendants", "Chains", "Mangalsutra", "Necklaces", "Jewellery Sets", "Festive", "Daily Wear", "Office Wear", "Anti-Tarnish"];

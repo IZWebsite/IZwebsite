@@ -27,6 +27,13 @@ User choices: Supabase + Netlify; Razorpay ready for test keys (online payment o
 - New homepage section keys (marquee, features, tabs) show automatically for existing stores. The owner's "Set up store defaults" saves them so they become editable.
 - Floating buttons stay hidden until the consent banner is answered.
 
+## Update (2026-10-21): sample content + category row
+- Admin → Website content: "Load sample content" adds any missing homepage sections (marquee, features, tabs), fills only empty section text, makes sections visible, and adds 8 [SAMPLE] products (is_demo=true, /demo images) mapped to existing categories. "Remove sample products" deletes is_demo products.
+- Testimonials fall back to section Body lines "Name | quote" when there are no approved reviews.
+- Homepage categories: one horizontally scrollable row (all featured, or all visible if none featured).
+- Root cause of hidden sections: no published products/reviews in the DB, and marquee/features/tabs rows were missing from homepage_content.
+- The loader is NOT tested against the real DB (it would write to customer data).
+
 ## Pending / Backlog
 - P0: The user must run `supabase/setup_all.sql` in the Supabase SQL Editor and create the owner role (README). After that, run end-to-end UI testing on the live Supabase project.
 - P0: Add Netlify env vars (service role, Razorpay test keys, webhook secret, Resend), deploy, and verify.

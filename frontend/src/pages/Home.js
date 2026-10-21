@@ -87,17 +87,17 @@ const Row = ({ s, items, loading }) => {
 
 function Categories({ s }) {
   const { categories } = useStore();
-  const list = categories.filter((c) => c.is_featured && c.is_visible).slice(0, 6);
+  const featured = categories.filter((c) => c.is_featured && c.is_visible);
+  const list = featured.length ? featured : categories.filter((c) => c.is_visible);
   if (!list.length) return null;
   return (
-    <section className="container-x pt-12 md:pt-16 pb-6" data-testid="home-section-categories">
+    <section className="container-x pt-10 md:pt-14 pb-4" data-testid="home-section-categories">
       {s.title && <SectionHead eyebrow={s.subtitle} title={s.title} action="All categories" to="/shop" />}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-5">
+      <div className="flex gap-3 md:gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-2" data-testid="category-scroll-row">
         {list.map((c, n) => (
-          <Link key={c.id} to={`/shop?category=${c.slug}`} className="group relative block overflow-hidden rounded-xl bg-muted aspect-[4/5] md:aspect-[4/3]" data-testid={`category-tile-${c.slug}`}>
-            <img src={c.image_url || CAT_FALLBACK[n % CAT_FALLBACK.length]} alt={c.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
-            <span className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/45 backdrop-blur-md text-white px-5 md:px-7 h-9 md:h-11 inline-flex items-center text-[11px] md:text-xs uppercase tracking-[0.2em] whitespace-nowrap group-hover:bg-white group-hover:text-foreground transition-colors">{c.name}</span>
+          <Link key={c.id} to={`/shop?category=${c.slug}`} className="group shrink-0 snap-start w-[30%] sm:w-40 md:w-48 text-center" data-testid={`category-tile-${c.slug}`}>
+            <div className="overflow-hidden rounded-xl bg-muted aspect-square"><img src={c.image_url || CAT_FALLBACK[n % CAT_FALLBACK.length]} alt={c.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" /></div>
+            <p className="mt-2.5 text-[11px] md:text-xs uppercase tracking-[0.18em] group-hover:text-[color:var(--gold)] transition-colors truncate">{c.name}</p>
           </Link>
         ))}
       </div>
@@ -156,11 +156,13 @@ function Tabs({ s, p }) {
 function Testimonials({ s }) {
   const [reviews, setReviews] = useState([]);
   useEffect(() => { supabase.from("product_reviews").select("id,author_name,rating,title,body,is_verified").eq("status", "approved").gte("rating", 4).order("created_at", { ascending: false }).limit(6).then(({ data }) => setReviews(data || [])); }, []);
-  if (!reviews.length) return null;
+  const manual = (s.body || "").split("\n").filter((x) => x.includes("|")).map((x, i) => { const [a, b] = x.split("|").map((y) => y.trim()); return { id: `m${i}`, author_name: a, rating: 5, body: b }; });
+  const list = reviews.length ? reviews : manual;
+  if (!list.length) return null;
   return (
     <section className="container-x py-16 md:py-20" data-testid="home-section-testimonials">
       <SectionHead title={s.title} />
-      <div className="grid md:grid-cols-3 gap-6">{reviews.map((r) => (
+      <div className="grid md:grid-cols-3 gap-6">{list.map((r) => (
         <figure key={r.id} className="card-x p-8"><div className="flex gap-0.5 mb-4">{Array.from({ length: r.rating }).map((_, i) => <Star key={i} size={14} className="fill-[color:var(--gold)] text-[color:var(--gold)]" />)}</div>
           <blockquote className="font-display text-xl leading-snug">{r.title || r.body}</blockquote>{r.title && <p className="text-sm text-muted-foreground mt-3 line-clamp-3">{r.body}</p>}
           <figcaption className="text-xs uppercase tracking-wider mt-5">{r.author_name}{r.is_verified && " · Verified buyer"}</figcaption></figure>

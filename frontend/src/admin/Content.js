@@ -6,6 +6,14 @@ import { useStore } from "../context/StoreContext";
 import { useAuth, can } from "../context/AuthContext";
 import { Field } from "../components/Bits";
 import { Card, PageTitle, ImageInput, SettingForm, confirmAction } from "./kit";
+import SampleContent from "./SampleContent";
+
+const HINTS = {
+  marquee: "Body: one message per line.", features: "Body: one per line as Title | short text (max 4).",
+  testimonials: "Real approved reviews show first. Until you have some, Body lines as Name | quote are shown.",
+  offer: "Shows products that have a sale price.", tabs: "Tabs fill from products marked Festive, Anti-Tarnish, Trending or with a sale price.",
+  recently_viewed: "Only appears for visitors who have viewed products.",
+};
 
 function Sections() {
   const { sections, reload } = useStore();
@@ -36,6 +44,7 @@ function SectionForm({ s, onSave }) {
   if (["hero", "promo"].includes(s.section_key)) return <p className="text-xs text-muted-foreground p-3">Edit these in "Banners" below.</p>;
   return (
     <div className="grid sm:grid-cols-2 gap-3 p-3 bg-secondary/50 mt-2">
+      {HINTS[s.section_key] && <p className="sm:col-span-2 text-xs text-muted-foreground">{HINTS[s.section_key]}</p>}
       <Field label="Title"><input className="input" value={f.title || ""} onChange={up("title")} /></Field>
       <Field label="Subtitle / eyebrow"><input className="input" value={f.subtitle || ""} onChange={up("subtitle")} /></Field>
       <div className="sm:col-span-2"><Field label="Body text"><textarea className="input h-20 py-2" value={f.body || ""} onChange={up("body")} /></Field></div>
@@ -115,6 +124,7 @@ export default function Content() {
   return (
     <div className="space-y-6" data-testid="admin-content">
       <PageTitle title="Website content" />
+      {can(role, "products") && <SampleContent />}
       <SettingForm k="announcement" title="Announcement bar" fields={[["enabled", "Show announcement", "bool"], ["text", "Text"], ["link", "Link (optional)"]]} />
       <Banners />
       <Sections />
