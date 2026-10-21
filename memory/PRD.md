@@ -16,6 +16,12 @@ User choices: Supabase + Netlify; Razorpay ready for test keys (online payment o
 - Admin: overview metrics and charts, traffic analytics with a "live" estimate, orders (filters, CSV, detail, transitions, tracking, notes, invoice print, Razorpay refund), products (bulk edit, CSV import/export, editor with images, variants and movement history), categories, coupons, review moderation, content CMS (banners, sections, brand/logo, pages, FAQ, SEO, contact) with version restore, customers (detail, notes, owner delete), settings (payments, shipping, tax, policies, notifications, analytics, maintenance, integration health, notification log, staff roles, audit log).
 - Tests: 15 pytest DB tests (oversell concurrency, reservations, payment idempotency, coupons, transitions, RLS isolation, self-grant blocked) and 5 Node function tests. All pass on a local Postgres. `yarn build` passes.
 
+## Update (2026-10-21, iteration 2)
+- The user ran the schema and logic SQL on the live project and skipped the starter data. The user is already owner: logo, contact and announcement were saved through the admin.
+- Added the owner-only "Set up store defaults" button (Admin → Overview). It creates the missing settings, homepage sections and categories without demo products.
+- Home page now falls back to default sections and hero. The footer, contact and FAQ pages handle empty settings. The announcement bar opens external links correctly.
+- Testing agent iteration_1: all 13 storefront flows pass at 1920px and 390px. No accounts or orders were created on the live DB.
+
 ## Pending / Backlog
 - P0: The user must run `supabase/setup_all.sql` in the Supabase SQL Editor and create the owner role (README). After that, run end-to-end UI testing on the live Supabase project.
 - P0: Add Netlify env vars (service role, Razorpay test keys, webhook secret, Resend), deploy, and verify.

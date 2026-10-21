@@ -12,7 +12,7 @@ export const Logo = ({ className = "" }) => {
   const { settings } = useStore();
   const b = settings.brand || {};
   return b.logo_url
-    ? <img src={b.logo_url} alt={b.name || "IMINATIONZ"} className={`h-9 md:h-11 w-auto ${className}`} />
+    ? <img src={b.logo_url} alt={b.name || "IMINATIONZ"} className={`h-12 md:h-16 w-auto max-w-[200px] object-contain ${className}`} />
     : <span className={`font-display text-2xl md:text-[28px] tracking-[0.22em] ${className}`}>{b.name || "IMINATIONZ"}</span>;
 };
 
@@ -22,7 +22,8 @@ function Announcement() {
   if (!a?.enabled || !a.text) return null;
   return (
     <div className="bg-primary text-primary-foreground text-[12px] tracking-[0.12em] text-center py-2 px-4" data-testid="announcement-bar">
-      {a.link ? <Link to={a.link} className="hover:opacity-80">{a.text}</Link> : a.text}
+      {!a.link ? a.text : a.link.startsWith("/") ? <Link to={a.link} className="hover:opacity-80">{a.text}</Link>
+        : <a href={/^https?:\/\//.test(a.link) ? a.link : `https://${a.link}`} target="_blank" rel="noreferrer" className="hover:opacity-80">{a.text}</a>}
     </div>
   );
 }
@@ -130,9 +131,9 @@ function Footer() {
         </div>
         <div><p className="eyebrow mb-4">Shop</p><ul className="space-y-2 text-sm opacity-80"><li><Link to="/shop">All jewellery</Link></li><li><Link to="/shop?collection=anti-tarnish">Anti-tarnish</Link></li><li><Link to="/shop?collection=festive">Festive</Link></li><li><Link to="/track">Track your order</Link></li></ul></div>
         <div><p className="eyebrow mb-4">Help</p><ul className="space-y-2 text-sm opacity-80">
-          {["shipping", "returns", "cancellation", "care", "faq", "privacy", "terms"].map((k) => <li key={k}><Link to={`/pages/${k}`}>{settings.pages?.[k]?.title || (k === "faq" ? "FAQ" : k)}</Link></li>)}
+          {["shipping", "returns", "cancellation", "care", "faq", "privacy", "terms"].map((k) => <li key={k}><Link to={`/pages/${k}`}>{settings.pages?.[k]?.title || { shipping: "Shipping", returns: "Returns & refunds", cancellation: "Cancellation", care: "Jewellery care", faq: "FAQ", privacy: "Privacy policy", terms: "Terms" }[k]}</Link></li>)}
         </ul></div>
-        <div><p className="eyebrow mb-4">Contact</p><ul className="space-y-2 text-sm opacity-80"><li>{c.email}</li><li>{c.phone}</li><li>{c.hours}</li><li><Link to="/pages/about">About us</Link></li></ul></div>
+        <div><p className="eyebrow mb-4">Contact</p><ul className="space-y-2 text-sm opacity-80">{[c.email, c.phone, c.hours].filter(Boolean).map((x) => <li key={x}>{x}</li>)}<li><Link to="/pages/contact">Contact us</Link></li><li><Link to="/pages/about">About us</Link></li></ul></div>
       </div>
       <div className="border-t border-white/10 py-6 text-center text-xs opacity-60">© {new Date().getFullYear()} {b.name || "IMINATIONZ"}. All prices in INR.</div>
     </footer>

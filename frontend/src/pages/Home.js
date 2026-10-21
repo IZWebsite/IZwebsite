@@ -33,7 +33,7 @@ function Hero() {
           </div>
         </div>
         <div className="order-1 lg:order-2 relative min-h-[52vh] lg:min-h-0">
-          <img src={h.image_url || "/demo/hero.jpg"} alt={h.title || "IMINATIONZ jewellery"} className="absolute inset-0 w-full h-full object-cover" fetchpriority="high" />
+          <img src={h.image_url || "/demo/hero.jpg"} alt={h.title || "IMINATIONZ jewellery"} className="absolute inset-0 w-full h-full object-cover" fetchPriority="high" />
         </div>
       </div>
     </section>

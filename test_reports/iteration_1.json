@@ -1,0 +1,37 @@
+{
+  "summary": "Frontend-only test against the preview URL, which is backed by the live Supabase project with no products, categories or banners. No registration, login, newsletter or order was submitted. All 13 requested flows passed at 1920px and 390px: home fallback, consent, search, shop and filters, cart, checkout, auth UI, account redirect, admin guard, track, not-found pages, info pages and responsive layout. The live DB already has brand settings: a logo image, the name 'Iminationz' and a tagline.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Home hero img", "issue": "React console error: invalid DOM property 'fetchpriority' (React needs fetchPriority). Fixed by the tester.", "selector": "[data-testid=home-hero] img", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Footer", "issues": ["Help links fall back to raw lowercase slugs ('shipping', 'returns', 'cancellation', 'care', 'privacy', 'terms') when settings.pages is empty. They should be title-cased.", "The Contact column renders empty <li> items for email, phone and hours when contact settings are missing. Only 'About us' is visible."]},
+      {"screen": "Header logo", "issue_detail": "The uploaded logo is a 1600x1600 square PNG with heavy padding. It renders at about 36px wide, so the mark is barely legible. Consider trimming the image or allowing a wider render.", "issues": ["Logo too small to read"]},
+      {"screen": "/pages/contact", "issues": ["Shows 'Email:', 'Phone:' and 'Hours:' with empty values because contact settings are not set. Hide the empty rows."]},
+      {"screen": "/pages/faq", "issues": ["Only the heading 'Frequently Asked Questions' renders, with no content or placeholder."]},
+      {"screen": "Home story section", "issues": ["Shows placeholder copy '[Your brand story — a few lines on how IMINATIONZ began.]' from the defaults. The owner must replace it before launch."]},
+      {"screen": "Home hero (desktop)", "issues": ["The hero text column starts about 90px left of the header container edge, so it does not line up with the logo. Minor."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Title-case the footer Help link fallbacks (or add a label map) when settings.pages is empty",
+    "Hide empty contact rows in the footer and on /pages/contact when values are missing",
+    "Show placeholder content on /pages/faq, or treat it as not found when there is no content",
+    "Remind the owner to replace the placeholder brand story and to upload a trimmed or horizontal logo"
+  ],
+  "critical_code_review_comments": [
+    "Shop.js search: q is put into a PostgREST .or() filter with only %,() stripped. A '.' or ':' in the query could still produce malformed filter syntax, which gives an empty result rather than a security issue. Consider escaping it, or using an RPC or textSearch.",
+    "Shop.js and Home.js ignore the Supabase error object, so a network or RLS failure shows the same empty state as 'no products'. Consider showing an error state.",
+    "Auth.js: the country code <select> has no data-testid."
+  ],
+  "updated_files": ["/app/frontend/src/pages/Home.js (fetchpriority -> fetchPriority)"],
+  "success_rate": {"backend": "N/A (skipped as requested)", "frontend": "100% of requested flows"},
+  "test_credentials": "None used; /app/memory/test_credentials.md says no accounts exist",
+  "seed_data_creation": "None. Only the read-only track lookup was submitted (IMZ000000-1 / nobody@example.com).",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Live Supabase DB has no products or categories, but brand settings exist (logo PNG, name 'Iminationz', tagline 'Wear Elegance, Share Kindness.'). Verified at 1920 and 390px: hero fallback, consent hiding, search to /shop?q=, sort/collection URL params, mobile filter sheet, cart drawer and /cart empty, /checkout 'Nothing to check out', auth mode switching, /account redirecting to /login?next=/account, /admin and /admin/orders showing admin-no-access, track toast 'No order found with those details', product/order/random-page not-found states, /pages/privacy not found. Admin features remain untested because there is no owner account."
+}

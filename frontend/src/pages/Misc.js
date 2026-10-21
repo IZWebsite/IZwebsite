@@ -18,8 +18,8 @@ export function InfoPage() {
     <article className="container-x py-14 md:py-20 max-w-3xl" data-testid={`info-page-${slug}`}>
       <p className="eyebrow mb-3">IMINATIONZ</p>
       <h1 className="font-display text-4xl md:text-5xl mb-10">{page.title}</h1>
-      {slug === "faq" ? (settings.faq?.items || []).map((f, i) => <div key={i} className="border-b py-5"><p className="font-display text-xl">{f.q}</p><p className="text-sm text-muted-foreground mt-2">{f.a}</p></div>)
-        : slug === "contact" ? <div className="space-y-2 text-sm"><p>Email: {c.email}</p><p>Phone: {c.phone}</p><p>Hours: {c.hours}</p><p>{c.address}</p></div>
+      {slug === "faq" ? ((settings.faq?.items || []).length ? settings.faq.items.map((f, i) => <div key={i} className="border-b py-5"><p className="font-display text-xl">{f.q}</p><p className="text-sm text-muted-foreground mt-2">{f.a}</p></div>) : <p className="text-sm text-muted-foreground">Answers are coming soon. Please <Link to="/pages/contact" className="link-u">contact us</Link> with any question.</p>)
+        : slug === "contact" ? <div className="space-y-2 text-sm">{[["Email", c.email], ["Phone", c.phone], ["Hours", c.hours], ["", c.address]].filter(([, v]) => v).map(([l, v]) => <p key={l + v}>{l && `${l}: `}{v}</p>)}{!c.email && !c.phone && <p className="text-muted-foreground">Contact details will be added soon.</p>}</div>
         : <div className="text-[15px] leading-relaxed text-foreground/85 whitespace-pre-line">{page.body}</div>}
     </article>
   );
