@@ -8,18 +8,19 @@ import { inr, fmtDate, slugify, toCSV, parseCSV, download } from "../lib/format"
 import { Field, Spinner } from "../components/Bits";
 import { Card, PageTitle, confirmAction } from "./kit";
 import BulkUpload from "./BulkUpload";
+import BulkPhotos from "./BulkPhotos";
 
 export function Products() {
   const { categories } = useStore();
   const [rows, setRows] = useState(null);
-  const [f, setF] = useState({ q: "", status: "", cat: "", sort: "created_at" });
+  const [f, setF] = useState({ q: "", status: "", cat: "", sort: "created_at", stock: new URLSearchParams(window.location.search).get("stock") || "" });
   const [edits, setEdits] = useState({});
   const load = useCallback(() => {
     let q = supabase.from("catalog").select("*").order(f.sort, { ascending: f.sort === "available" || f.sort === "name" });
     if (f.status) q = q.eq("status", f.status);
     if (f.cat) q = q.eq("category_id", f.cat);
     if (f.q) { const s = f.q.replace(/[%,()]/g, " "); q = q.or(`name.ilike.%${s}%,sku.ilike.%${s}%`); }
-    q.limit(500).then(({ data }) => setRows(data || []));
+    q.limit(500).then(({ data }) => setRows((data || []).filter((p) => f.stock !== "low" || p.available <= p.low_stock_threshold)));
   }, [f]);
   useEffect(() => { load(); }, [load]);
   const edit = (id, k, v) => setEdits((e) => ({ ...e, [id]: { ...e[id], id, [k]: v === "" ? null : Number(v) } }));
@@ -34,15 +35,19 @@ export function Products() {
     download("products.csv", toCSV((data || []).map(({ categories: c, ...p }) => ({ ...p, category_slug: c?.slug || "" }))));
   };
   const [bulk, setBulk] = useState(false);
+  const [photos, setPhotos] = useState(false);
   const n = Object.keys(edits).length;
   return (
     <div data-testid="admin-products">
       <PageTitle title="Products">
         <button className="btn-outline h-10" onClick={exportCsv} data-testid="products-export-btn"><Download size={15} />CSV</button>
         <button className="btn-outline h-10" onClick={() => setBulk(!bulk)} data-testid="bulk-upload-btn"><Upload size={15} />Bulk upload</button>
+        <button className="btn-outline h-10" onClick={() => setPhotos(!photos)} data-testid="bulk-photos-btn"><Upload size={15} />Bulk photos</button>
         <Link to="/admin/products/new" className="btn-primary h-10" data-testid="add-product-btn"><Plus size={15} />Add product</Link>
       </PageTitle>
       {bulk && <div className="mb-6"><BulkUpload onClose={() => setBulk(false)} onDone={load} /></div>}
+      {photos && <div className="mb-6"><BulkPhotos onClose={() => setPhotos(false)} onDone={load} /></div>}
+      <div className="flex gap-2 mb-3">{[["", "All products"], ["low", "Low & out of stock"]].map(([v, l]) => <button key={v} onClick={() => setF({ ...f, stock: v })} className={`h-9 px-4 rounded-full text-xs border transition-colors ${f.stock === v ? "bg-[#2b2420] text-white border-[#2b2420]" : "hover:border-foreground"}`} data-testid={`stock-filter-${v || "all"}`}>{l}</button>)}</div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
         <input className="input col-span-2 md:col-span-1" placeholder="Search name or SKU" value={f.q} onChange={(e) => setF({ ...f, q: e.target.value })} data-testid="products-search-input" />
         <select className="input" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value })} data-testid="products-status-filter"><option value="">All statuses</option><option value="published">Published</option><option value="draft">Draft</option><option value="archived">Archived</option></select>

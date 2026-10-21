@@ -10,6 +10,23 @@ const webhook = require("../functions/razorpay-webhook");
 const verify = require("../functions/razorpay-verify");
 const { runQueue, MAX_ATTEMPTS } = require("../functions/_shared/notify");
 
+test("daily stock digest lists only low and sold-out products, most urgent first", () => {
+  const { pickItems } = require("../functions/daily-stock-digest");
+  const out = pickItems([
+    { name: "A", sku: "A", available: 10, low_stock_threshold: 3 },
+    { name: "B", sku: "B", available: 2, low_stock_threshold: 3 },
+    { name: "C", sku: "C", available: 0, low_stock_threshold: 3 },
+    { name: "D", sku: "D", available: 3, low_stock_threshold: 3 },
+  ]);
+  assert.deepStrictEqual(out.map((i) => i.sku), ["C", "B", "D"]);
+});
+
+test("stock digest email renders the product table", () => {
+  const { emailHtml } = require("../functions/_shared/notify");
+  const html = emailHtml({ n: { event: "stock_digest", audience: "owner", payload: { out: 1, low: 1, items: [{ name: "Ring <x>", sku: "R1", available: 0 }, { name: "Hoop", sku: "H1", available: 2 }] } }, o: null, brand: {}, contact: {} });
+  assert.ok(html.includes("Daily stock check") && html.includes("Ring &lt;x&gt;") && html.includes("Sold out") && html.includes("stock=low"));
+});
+
 test("payment signature verification matches Razorpay's HMAC-SHA256 scheme", () => {
   const expected = crypto.createHmac("sha256", "key_secret_test").update("order_1|pay_1").digest("hex");
   assert.ok(safeEq(hmac("key_secret_test", "order_1|pay_1"), expected));

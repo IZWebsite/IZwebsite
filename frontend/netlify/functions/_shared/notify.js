@@ -5,7 +5,7 @@ const LABEL = {
   shipped: "Your order has shipped", out_for_delivery: "Out for delivery", delivered: "Delivered", cancelled: "Order cancelled",
   return_approved: "Return approved", refund_initiated: "Refund initiated", refunded: "Refund completed",
   new_order: "New order received", order_cancelled: "Order cancelled", cancellation_requested: "Cancellation requested",
-  return_requested: "Return requested", refund_required: "Refund required (late payment)", low_stock: "Low stock", out_of_stock: "Out of stock",
+  return_requested: "Return requested", refund_required: "Refund required (late payment)", low_stock: "Low stock", out_of_stock: "Out of stock", stock_digest: "Daily stock check",
   account_deletion_requested: "Account deletion requested", integration_failed: "Notification integration failing",
 };
 const inr = (n) => `₹${Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
@@ -23,6 +23,11 @@ function emailHtml({ n, o, brand, contact }) {
     <table width="100%" cellpadding="6" style="border-collapse:collapse;font-size:14px">${(o.order_items || []).map((i) => `<tr style="border-bottom:1px solid #eee"><td>${esc(i.product_name)}${i.variant_name ? ` (${esc(i.variant_name)})` : ""} × ${i.quantity}</td><td align="right">${inr(i.line_total)}</td></tr>`).join("")}
     <tr><td>Discount</td><td align="right">−${inr(o.discount)}</td></tr><tr><td>Shipping</td><td align="right">${inr(o.shipping_fee)}</td></tr><tr><td><b>Total</b></td><td align="right"><b>${inr(o.total)}</b></td></tr></table>
     <p style="margin:24px 0"><a href="${link}" style="background:#2b2420;color:#fbf8f3;padding:12px 22px;text-decoration:none">View order</a></p>`;
+  } else if (n.event === "stock_digest") {
+    const p = n.payload || {};
+    inner = `<p style="margin:0 0 16px">${p.out || 0} out of stock · ${p.low || 0} running low.</p>
+    <table width="100%" cellpadding="6" style="border-collapse:collapse;font-size:14px"><tr style="background:#fbf8f3"><td><b>Product</b></td><td><b>SKU</b></td><td align="right"><b>Left</b></td></tr>${(p.items || []).map((i) => `<tr style="border-bottom:1px solid #eee"><td>${esc(i.name)}</td><td>${esc(i.sku)}</td><td align="right" style="color:${i.available <= 0 ? "#b91c1c" : "#b45309"}">${i.available <= 0 ? "Sold out" : i.available}</td></tr>`).join("")}</table>
+    <p style="margin:24px 0"><a href="${site()}/admin/products?stock=low" style="background:#2b2420;color:#fbf8f3;padding:12px 22px;text-decoration:none">Restock now</a></p>`;
   } else {
     inner = `<p>${esc(title)}: ${esc(Object.entries(n.payload || {}).map(([k, v]) => `${k}: ${v}`).join(", "))}</p>`;
   }

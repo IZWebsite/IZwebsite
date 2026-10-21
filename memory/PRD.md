@@ -38,6 +38,11 @@ User choices: Supabase + Netlify; Razorpay ready for test keys (online payment o
 - Homepage category row: left/right arrow buttons on desktop, shown only when the row overflows (verified at 900px; hidden at 1920px with 5 tiles).
 - Admin → Products → "Bulk upload" (BulkUpload.js) replaces the old CSV import: template download, .xlsx (read-excel-file/universal) or .csv, row-by-row preview with errors and warnings, category matched by name or slug, image_urls separated by |, Yes/No flags, new SKUs inserted and existing SKUs updated (slug kept), images appended without duplicates. NOT tested end-to-end (no owner login; it would write to customer data).
 
+## Update (2026-10-21): bulk photos + low-stock alerts
+- Admin → Products → "Bulk photos" (BulkPhotos.js): pick many photos named by SKU (SKU.jpg, SKU-2.jpg, SKU_3.png, "SKU (4).webp"), preview matched and unmatched files, upload sequentially with progress, append to existing images (first becomes main if none exist).
+- Products list: "Low & out of stock" filter chip (also opens via /admin/products?stock=low).
+- Netlify scheduled function daily-stock-digest (30 3 * * * = 09:00 IST) emails the owner a table of low and sold-out published products (needs owner alert email + RESEND_API_KEY/EMAIL_FROM on Netlify; otherwise logged as skipped). Node tests: 7 pass. Admin UI not tested end-to-end (no owner login).
+
 ## Pending / Backlog
 - P0: The user must run `supabase/setup_all.sql` in the Supabase SQL Editor and create the owner role (README). After that, run end-to-end UI testing on the live Supabase project.
 - P0: Add Netlify env vars (service role, Razorpay test keys, webhook secret, Resend), deploy, and verify.
