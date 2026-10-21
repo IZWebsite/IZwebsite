@@ -48,8 +48,8 @@ function Header() {
       <div className="container-x h-16 md:h-20 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
         <div className="flex items-center min-w-0">
           <button className="lg:hidden p-2 -ml-2" onClick={() => setOpen(true)} aria-label="Open menu" data-testid="mobile-menu-btn"><Menu size={22} strokeWidth={1.5} /></button>
-          <nav className="hidden lg:flex flex-wrap items-center gap-x-6 gap-y-1 text-[14px]">
-            {NAV.map(([l, to]) => <NavLink key={l} to={to} className="hover:text-[color:var(--gold)] transition-colors whitespace-nowrap" data-testid={`nav-${l.toLowerCase().replace(/\s+/g, "-")}`}>{l}</NavLink>)}
+          <nav className="hidden lg:flex flex-nowrap items-center gap-x-5 xl:gap-x-6 text-[13px] xl:text-[14px]">
+            {NAV.map(([l, to], i) => <NavLink key={l} to={to} className={`hover:text-[color:var(--gold)] transition-colors whitespace-nowrap ${i >= 6 ? "hidden 2xl:inline" : i >= 4 ? "hidden xl:inline" : ""}`} data-testid={`nav-${l.toLowerCase().replace(/\s+/g, "-")}`}>{l}</NavLink>)}
           </nav>
         </div>
         <Link to="/" data-testid="header-logo" className="justify-self-center"><Logo /></Link>

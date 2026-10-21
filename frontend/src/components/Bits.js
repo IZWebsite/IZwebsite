@@ -3,10 +3,10 @@ import { PackageOpen } from "lucide-react";
 import { inr, STATUS, statusTone } from "../lib/format";
 
 export const SectionHead = ({ eyebrow, title, action, to }) => (
-  <div className="flex items-end justify-between gap-6 mb-8 md:mb-10">
+  <div className="flex items-end justify-between gap-4 md:gap-6 mb-6 md:mb-8 lg:mb-10">
     <div>
       {eyebrow && <p className="text-sm text-muted-foreground mb-2">{eyebrow}</p>}
-      <h2 className="font-display text-4xl md:text-5xl leading-tight">{title}</h2>
+      <h2 className="font-display text-3xl md:text-4xl lg:text-5xl leading-tight">{title}</h2>
     </div>
     {action && to && <Link to={to} className="hidden md:inline-flex btn-primary rounded-md h-10 px-7 whitespace-nowrap" data-testid={`section-link-${title?.toLowerCase().replace(/\s+/g, "-")}`}>{action}</Link>}
   </div>

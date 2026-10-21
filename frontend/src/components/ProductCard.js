@@ -58,22 +58,22 @@ export default function ProductCard({ product, index = 0 }) {
             className={`absolute inset-0 w-full h-full object-cover transition-[transform,opacity] duration-700 group-hover:scale-[1.04] ${sold ? "opacity-60 grayscale-[30%]" : ""}`} />
           {product.hover_image_url && <img src={product.hover_image_url} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500" />}
         </Link>
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 pointer-events-none">
+        <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col items-start gap-1 md:gap-1.5 pointer-events-none">
           {sold && <span className="chip bg-foreground text-background border-foreground" data-testid="sold-out-badge">Sold out</span>}
           {!sold && product.discount_pct > 0 && <span className="chip bg-[color:var(--gold)] text-white border-transparent">-{product.discount_pct}%</span>}
-          {product.is_new && !sold && <span className="chip">New</span>}
-          {product.is_anti_tarnish && <span className="chip">Anti-tarnish</span>}
+          {product.is_new && !sold && <span className="chip hidden sm:inline-flex">New</span>}
+          {product.is_anti_tarnish && <span className="chip hidden md:inline-flex">Anti-tarnish</span>}
         </div>
         <button onClick={() => toggleWish(product.id)} aria-label="Toggle wishlist" data-testid={`wishlist-btn-${product.slug}`}
-          className="absolute top-3 right-3 h-9 w-9 grid place-items-center bg-background/85 backdrop-blur rounded-full hover:bg-background transition-colors">
+          className="absolute top-2 right-2 md:top-3 md:right-3 h-8 w-8 md:h-9 md:w-9 grid place-items-center bg-background/85 backdrop-blur rounded-full hover:bg-background transition-colors">
           <Heart size={16} strokeWidth={1.5} className={inWishlist(product.id) ? "fill-[color:var(--gold)] text-[color:var(--gold)]" : ""} />
         </button>
-        <div className="absolute inset-x-3 bottom-3 flex gap-2 md:translate-y-3 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 transition-[transform,opacity] duration-300">
-          <button className="btn-primary h-9 flex-1 px-2 text-xs" disabled={sold}
+        <div className="absolute inset-x-2 bottom-2 md:inset-x-3 md:bottom-3 flex gap-1.5 md:gap-2 lg:translate-y-3 lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100 transition-[transform,opacity] duration-300">
+          <button className="btn-primary h-8 md:h-9 flex-1 px-2 text-[11px] md:text-xs" disabled={sold}
             onClick={() => (product.variant_count > 0 ? setQv(true) : add(product))} data-testid={`quick-add-btn-${product.slug}`}>
             {sold ? "Sold out" : product.variant_count > 0 ? "Choose" : "Add to bag"}
           </button>
-          <button className="h-9 w-9 grid place-items-center bg-background" onClick={() => setQv(true)} aria-label="Quick view" data-testid={`quick-view-btn-${product.slug}`}><Eye size={15} /></button>
+          <button className="h-8 w-8 md:h-9 md:w-9 grid place-items-center bg-background" onClick={() => setQv(true)} aria-label="Quick view" data-testid={`quick-view-btn-${product.slug}`}><Eye size={15} /></button>
         </div>
       </div>
       <Link to={`/product/${product.slug}`} className="block mt-3.5">
