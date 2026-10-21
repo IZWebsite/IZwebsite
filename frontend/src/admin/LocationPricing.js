@@ -17,7 +17,10 @@ export default function LocationPricing() {
     setFinding(true);
     navigator.geolocation.getCurrentPosition(
       (p) => { setV((x) => ({ ...x, lat: +p.coords.latitude.toFixed(6), lng: +p.coords.longitude.toFixed(6) })); setFinding(false); toast.success("Store location set — press Save"); },
-      () => { setFinding(false); toast.error("Location permission was blocked"); },
+      (e) => {
+        setFinding(false);
+        toast.error(e.code === 1 ? "Location is blocked for this site. Tap the lock icon next to the web address → Site settings → Location → Allow, then try again. Or type the latitude and longitude from Google Maps." : e.code === 3 ? "Finding your location took too long. Move near a window or turn on GPS and try again." : "Couldn't find your location. Turn on your phone's location (GPS) and try again.", { duration: 9000 });
+      },
       { enableHighAccuracy: true, timeout: 15000 },
     );
   };
