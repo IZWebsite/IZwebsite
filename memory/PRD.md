@@ -22,6 +22,11 @@ User choices: Supabase + Netlify; Razorpay ready for test keys (online payment o
 - Home page now falls back to default sections and hero. The footer, contact and FAQ pages handle empty settings. The announcement bar opens external links correctly.
 - Testing agent iteration_1: all 13 storefront flows pass at 1920px and 390px. No accounts or orders were created on the live DB.
 
+## Update (2026-10-21, iteration 3): psychothreads-style layout in IMINATIONZ colours
+- Header: nav on the left, logo centred, icons on the right. Full-width hero with a pill CTA; an empty heading means image-only (for banners with text baked in). Dark scrolling offer strip, large rounded category tiles with pill labels, a 4-icon trust row, eyebrow + title + solid "View all" headings, offer band with sale items, tabbed collections, mobile bottom nav, gold back-to-top button.
+- New homepage section keys (marquee, features, tabs) show automatically for existing stores. The owner's "Set up store defaults" saves them so they become editable.
+- Floating buttons stay hidden until the consent banner is answered.
+
 ## Pending / Backlog
 - P0: The user must run `supabase/setup_all.sql` in the Supabase SQL Editor and create the owner role (README). After that, run end-to-end UI testing on the live Supabase project.
 - P0: Add Netlify env vars (service role, Razorpay test keys, webhook secret, Resend), deploy, and verify.

@@ -206,6 +206,19 @@ function Newsletter({ s }) {
   );
 }
 
+function withNewSections(sections) {
+  if (!sections.length) return DEFAULT_SECTIONS;
+  const has = (k) => sections.some((s) => s.section_key === k);
+  const def = (k) => DEFAULT_SECTIONS.find((d) => d.section_key === k);
+  const out = [...sections];
+  [["marquee", "hero"], ["features", "categories"], ["tabs", "new_arrivals"]].forEach(([k, after]) => {
+    if (has(k)) return;
+    const i = out.findIndex((s) => s.section_key === after);
+    out.splice(i < 0 ? 1 : i + 1, 0, def(k));
+  });
+  return out;
+}
+
 export default function Home() {
   const { sections } = useStore();
   const [products, setProducts] = useState(null);
@@ -226,7 +239,7 @@ export default function Home() {
   };
   return (
     <div data-testid="home-page">
-      {(sections.length ? sections : DEFAULT_SECTIONS).filter((s) => s.is_visible).map((s) => {
+      {withNewSections(sections).filter((s) => s.is_visible).map((s) => {
         const k = s.section_key;
         if (k === "hero") return <Hero key={k} />;
         if (k === "categories") return <Categories key={k} s={s} />;

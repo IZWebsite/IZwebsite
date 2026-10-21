@@ -1,0 +1,32 @@
+{
+  "summary": "Frontend-only test of the psychothreads-style redesign on the Emergent preview URL at 1440px and 390px. PASS: desktop header grid (7 nav links on the left at x 120-634, logo centred at x 672-768 in a 1440 viewport, search/wishlist/account/cart on the right). Search opens an autofocused input, and Enter goes to /shop?q=ring and closes the form. Full-width hero (1440x756) shows the overlay 'Iminationz' / 'Classy, elegant and charming' / SHOP NOW pill. 6 category tiles: 3 per row on desktop (387px wide), 2 per row on mobile (173px). Each has a centred pill label and links to /shop?category=slug. SectionHead shows a solid 'All categories' button. Mobile bottom nav works: Home, Shop->/shop, Bag->cart-drawer, Search->scrollY 0 + header input, Account->/login. main has pb 64px, so the footer ends exactly at the nav top (780). Back-to-top is absent at 500px, present at 1200px, and returns to scrollY 0. Shop, cart page, cart drawer, nav links and logo all work. There are 0 console or page errors. FAIL: the marquee strip and the 4 trust-feature icons do NOT render on the live site.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Home marquee + features (and tabs)", "issue": "home-section-marquee and home-section-features never render on the live site. RCA: the live Supabase homepage_content table has 13 rows (hero, categories, new_arrivals, offer, bestsellers, promo, trending, festive, recently_viewed, testimonials, story, care, newsletter) and no 'marquee', 'features' or 'tabs' rows. Home.js only falls back to DEFAULT_SECTIONS when sections.length === 0, so new section keys added to DEFAULT_SECTIONS are never shown to existing stores.", "selector": "[data-testid=home-section-marquee], [data-testid=home-section-features]", "priority": "HIGH"},
+      {"component": "ConsentBanner vs BackToTop / WhatsApp", "issue": "While the consent banner is showing, it covers other buttons. Desktop: the banner (bottom-0, z-50, about 78px tall) sits over back-to-top-btn (bottom-5), and Playwright reported 'consent-banner intercepts pointer events', so the button can't be clicked. Mobile: the banner (bottom-16, 141px tall, top at y=639) covers the WhatsApp button (y 648-700) and back-to-top (bottom-20). Both are hidden until the user picks Accept or Decline.", "selector": "[data-testid=consent-banner]", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Home hero", "issues": ["The owner's banner image already has text baked in ('IMINATIONZ / PREMIUM & ANTI-TARNISH JEWELRY / Waterproof. Worry-Free... / SHOP THE COLLECTION' plus a fake button). The code overlay ('Iminationz', subtitle, SHOP NOW pill) is drawn on top of it, giving doubled, overlapping text and two CTAs. On mobile the baked text is cropped ('NZ / WELRY / Luxury.'). Clearing the banner title would use the image-only path, or the owner could upload a text-free image. This is owner data, not a code bug, but worth telling the user."]},
+      {"screen": "Header logo", "issues": ["The uploaded brand logo appears to be a product photo (bracelet on a hand with 'BRIGHT 837 220' text), not a logo. This is owner data."]},
+      {"screen": "Back-to-top on footer", "issues": ["The bg-primary (dark brown) button sits on the dark #2b2420 footer at the bottom of the page and has very low contrast. Consider a gold or ivory variant."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Home.js: merge any DEFAULT_SECTIONS keys missing from the DB into the render list (e.g. insert marquee after hero and features after categories), or have SetupDefaults/a migration insert the missing marquee/features/tabs rows into homepage_content. Then confirm that the marquee and features show on the live site.",
+    "Stop the consent banner from covering the floating buttons: raise BackToTop/WhatsApp above the banner while it is visible, or offset them by the banner height (e.g. a body class when consent is pending)."
+  ],
+  "critical_code_review_comments": [
+    "Home.js: sections rendering is all-or-nothing from the DB. New features added to DEFAULT_SECTIONS silently never appear for existing stores. The same applies if every row is is_visible=false (blank homepage).",
+    "Layout.js: the floating stack uses hard-coded offsets (bottom-36/bottom-20/bottom-16) that do not account for the variable-height consent banner.",
+    "Layout.js NAV uses NavLink for query-string routes, so all /shop?... links count as 'active' on /shop. There is no active style today, so it is harmless, but plain Link is more accurate."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "~85% (marquee + features missing on live data; consent overlap)"},
+  "seed_data_creation": "None. Consent was declined in the test browser only. No accounts, newsletter signups or orders were made.",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Live Supabase: 1 hero banner (title 'Iminationz ', cta 'Shop now'), 13 homepage_content rows without marquee/features/tabs, 16 categories (6 featured tiles shown), 0 products, so PDP and product rows/offer/tabs could not be tested. Dismiss the consent banner before clicking floating buttons."
+}

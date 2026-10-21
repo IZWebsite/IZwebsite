@@ -147,10 +147,21 @@ function Footer() {
   );
 }
 
+function useConsentPending() {
+  const [pending, setPending] = useState(!getConsent());
+  useEffect(() => {
+    const h = () => setPending(!getConsent());
+    window.addEventListener("imz:consent", h);
+    return () => window.removeEventListener("imz:consent", h);
+  }, []);
+  return pending;
+}
+
 function WhatsAppFloat() {
   const { settings } = useStore();
+  const pending = useConsentPending();
   const n = (settings.contact?.whatsapp || "").replace(/\D/g, "");
-  if (!n) return null;
+  if (!n || pending) return null;
   return (
     <a href={`https://wa.me/${n}?text=${encodeURIComponent("Hi IMINATIONZ, I have a question")}`} target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp"
       className="fixed bottom-36 lg:bottom-20 right-4 lg:right-5 z-40 p-3.5 rounded-full bg-[#25D366] text-white shadow-lg hover:scale-105 transition-transform" data-testid="whatsapp-float-btn">
@@ -162,7 +173,7 @@ function WhatsAppFloat() {
 function ConsentBanner() {
   const [show, setShow] = useState(!getConsent());
   if (!show) return null;
-  const pick = (v) => { setConsent(v); setShow(false); };
+  const pick = (v) => { setConsent(v); setShow(false); window.dispatchEvent(new Event("imz:consent")); };
   return (
     <div className="fixed bottom-16 lg:bottom-0 inset-x-0 z-50 bg-card border-t p-4 md:p-5 reveal" data-testid="consent-banner">
       <div className="container-x flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
@@ -190,13 +201,14 @@ function BottomNav() {
 
 function BackToTop() {
   const [show, setShow] = useState(false);
+  const pending = useConsentPending();
   useEffect(() => {
     const h = () => setShow(window.scrollY > 700);
     window.addEventListener("scroll", h, { passive: true });
     return () => window.removeEventListener("scroll", h);
   }, []);
-  if (!show) return null;
-  return <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top" className="fixed bottom-20 lg:bottom-5 right-4 lg:right-5 z-40 h-12 w-12 rounded-full bg-primary text-primary-foreground grid place-items-center shadow-lg hover:bg-[color:var(--gold)] transition-colors reveal" data-testid="back-to-top-btn"><ArrowUp size={18} /></button>;
+  if (!show || pending) return null;
+  return <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top" className="fixed bottom-20 lg:bottom-5 right-4 lg:right-5 z-40 h-12 w-12 rounded-full bg-[color:var(--gold)] text-white ring-2 ring-white/70 grid place-items-center shadow-lg hover:bg-[#967545] transition-colors reveal" data-testid="back-to-top-btn"><ArrowUp size={18} /></button>;
 }
 
 function SetupNotice() {
