@@ -109,7 +109,7 @@ function Categories({ s }) {
       {s.title && <SectionHead eyebrow={s.subtitle} title={s.title} action="All categories" to="/shop" />}
       <div className="relative group/row">
       {over && [-1, 1].map((d) => (
-        <button key={d} onClick={() => slide(d)} aria-label={d < 0 ? "Previous categories" : "Next categories"} className={`hidden md:flex absolute top-[38%] -translate-y-1/2 z-10 h-11 w-11 items-center justify-center rounded-full bg-white/95 shadow-md border hover:bg-[#2b2420] hover:text-white transition-colors ${d < 0 ? "-left-5" : "-right-5"}`} data-testid={d < 0 ? "category-prev-btn" : "category-next-btn"}>{d < 0 ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}</button>
+        <button key={d} onClick={() => slide(d)} aria-label={d < 0 ? "Previous categories" : "Next categories"} className={`hidden lg:flex absolute top-[38%] -translate-y-1/2 z-10 h-11 w-11 items-center justify-center rounded-full bg-white/95 shadow-md border hover:bg-[#2b2420] hover:text-white transition-colors ${d < 0 ? "-left-5" : "-right-5"}`} data-testid={d < 0 ? "category-prev-btn" : "category-next-btn"}>{d < 0 ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}</button>
       ))}
       <div ref={ref} className="flex gap-3 md:gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-4 sm:scroll-px-6 lg:scroll-px-0 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 pb-2" data-testid="category-scroll-row">
         {list.map((c, n) => (
@@ -231,11 +231,12 @@ function withNewSections(sections) {
   if (!sections.length) return DEFAULT_SECTIONS;
   const has = (k) => sections.some((s) => s.section_key === k);
   const def = (k) => DEFAULT_SECTIONS.find((d) => d.section_key === k);
-  const out = [...sections];
+  const late = (k) => sections.find((s) => s.section_key === k && s.sort_order >= 100);
+  const out = sections.filter((s) => !(s.sort_order >= 100 && ["marquee", "features", "tabs"].includes(s.section_key)));
   [["marquee", "hero"], ["features", "categories"], ["tabs", "new_arrivals"]].forEach(([k, after]) => {
-    if (has(k)) return;
+    if (has(k) && !late(k)) return;
     const i = out.findIndex((s) => s.section_key === after);
-    out.splice(i < 0 ? 1 : i + 1, 0, def(k));
+    out.splice(i < 0 ? 1 : i + 1, 0, late(k) || def(k));
   });
   return out;
 }

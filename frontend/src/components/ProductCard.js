@@ -62,7 +62,7 @@ export default function ProductCard({ product, index = 0 }) {
           {sold && <span className="chip bg-foreground text-background border-foreground" data-testid="sold-out-badge">Sold out</span>}
           {!sold && product.discount_pct > 0 && <span className="chip bg-[color:var(--gold)] text-white border-transparent">-{product.discount_pct}%</span>}
           {product.is_new && !sold && <span className="chip hidden sm:inline-flex">New</span>}
-          {product.is_anti_tarnish && <span className="chip hidden md:inline-flex">Anti-tarnish</span>}
+          {product.is_anti_tarnish && <span className="chip hidden lg:inline-flex">Anti-tarnish</span>}
         </div>
         <button onClick={() => toggleWish(product.id)} aria-label="Toggle wishlist" data-testid={`wishlist-btn-${product.slug}`}
           className="absolute top-2 right-2 md:top-3 md:right-3 h-8 w-8 md:h-9 md:w-9 grid place-items-center bg-background/85 backdrop-blur rounded-full hover:bg-background transition-colors">

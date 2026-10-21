@@ -12,6 +12,20 @@ const fill = (s) => {
   return patch;
 };
 
+const ANCHOR = { marquee: "hero", features: "categories", tabs: "new_arrivals" };
+
+// Moves sections added later (sort_order >= 100) next to their natural neighbour, then renumbers 1..n.
+async function reorder() {
+  const { data, error } = await supabase.from("homepage_content").select("id,section_key,sort_order").order("sort_order");
+  if (error) throw error;
+  const late = data.filter((s) => s.sort_order >= 100 && ANCHOR[s.section_key]);
+  const out = data.filter((s) => !late.includes(s));
+  late.forEach((s) => { const i = out.findIndex((x) => x.section_key === ANCHOR[s.section_key]); out.splice(i < 0 ? 1 : i + 1, 0, s); });
+  for (const [i, s] of out.entries()) {
+    if (s.sort_order !== i + 1) { const r = await supabase.from("homepage_content").update({ sort_order: i + 1 }).eq("id", s.id); if (r.error) throw r.error; }
+  }
+}
+
 async function loadSample(sections, categories) {
   const missing = DEFAULT_SECTIONS.filter((d) => !sections.some((s) => s.section_key === d.section_key)).map((d) => ({ ...d, ...fill(d), sort_order: d.sort_order + 100 }));
   if (missing.length) { const { error } = await supabase.from("homepage_content").insert(missing); if (error) throw error; }
@@ -19,6 +33,7 @@ async function loadSample(sections, categories) {
     const patch = fill(s);
     if (Object.keys(patch).length || !s.is_visible) { const { error } = await supabase.from("homepage_content").update({ ...patch, is_visible: true }).eq("id", s.id); if (error) throw error; }
   }
+  await reorder();
   const cat = (slug, n) => (categories.find((c) => c.slug === slug) || categories[n % Math.max(categories.length, 1)] || {}).id || null;
   const rows = SAMPLE_PRODUCTS.map(([name, sku, slug, price, sale, stock, img, flags], n) => ({
     name: `[SAMPLE] ${name}`, slug: `sample-${sku.toLowerCase()}`, sku, category_id: cat(slug, n), price, sale_price: sale, stock, status: "published",

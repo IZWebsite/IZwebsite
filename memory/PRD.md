@@ -43,6 +43,12 @@ User choices: Supabase + Netlify; Razorpay ready for test keys (online payment o
 - Products list: "Low & out of stock" filter chip (also opens via /admin/products?stock=low).
 - Netlify scheduled function daily-stock-digest (30 3 * * * = 09:00 IST) emails the owner a table of low and sold-out published products (needs owner alert email + RESEND_API_KEY/EMAIL_FROM on Netlify; otherwise logged as skipped). Node tests: 7 pass. Admin UI not tested end-to-end (no owner login).
 
+## Update (2026-10-21): responsive pass (mobile / tablet / laptop)
+- Product sections and testimonials: swipe rails below 1024px, 4- or 3-column grids at 1024px+. Section spacing and headings scale per breakpoint. Hero is shorter on mobile and focuses on the subject (object position 72%). Product-card chips are reduced on small screens; the quick-add bar is always visible below lg and shows on hover at lg+.
+- Header nav: 4 links at lg, 6 at xl+ (Festive only in the mobile menu), never wraps. Category arrows show at lg+ only.
+- Section order: late-added marquee/features/tabs (sort_order >= 100) render next to their anchors. "Load sample content" now renumbers sort_order in the DB.
+- Testing agent iteration_4: no overflow at any width. Its 2 defects (nav collision at 1536+, arrows at tablet) are fixed and confirmed by screenshot.
+
 ## Pending / Backlog
 - P0: The user must run `supabase/setup_all.sql` in the Supabase SQL Editor and create the owner role (README). After that, run end-to-end UI testing on the live Supabase project.
 - P0: Add Netlify env vars (service role, Razorpay test keys, webhook secret, Resend), deploy, and verify.

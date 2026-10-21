@@ -28,7 +28,7 @@ function Announcement() {
   );
 }
 
-const NAV = [["Shop all", "/shop"], ["New In", "/shop?sort=newest"], ["Bestsellers", "/shop?sort=popular"], ["Earrings", "/shop?category=earrings"], ["Necklaces", "/shop?category=necklaces"], ["Anti-Tarnish", "/shop?collection=anti-tarnish"], ["Festive", "/shop?collection=festive"]];
+const NAV = [["Shop all", "/shop"], ["New In", "/shop?sort=newest"], ["Bestsellers", "/shop?sort=popular"], ["Earrings", "/shop?category=earrings"], ["Necklaces", "/shop?category=necklaces"], ["Anti-Tarnish", "/shop?collection=anti-tarnish"], ["Festive", "/shop?collection=festive", true]];
 
 function Header() {
   const { count, setCartOpen } = useShop();
@@ -49,7 +49,7 @@ function Header() {
         <div className="flex items-center min-w-0">
           <button className="lg:hidden p-2 -ml-2" onClick={() => setOpen(true)} aria-label="Open menu" data-testid="mobile-menu-btn"><Menu size={22} strokeWidth={1.5} /></button>
           <nav className="hidden lg:flex flex-nowrap items-center gap-x-5 xl:gap-x-6 text-[13px] xl:text-[14px]">
-            {NAV.map(([l, to], i) => <NavLink key={l} to={to} className={`hover:text-[color:var(--gold)] transition-colors whitespace-nowrap ${i >= 6 ? "hidden 2xl:inline" : i >= 4 ? "hidden xl:inline" : ""}`} data-testid={`nav-${l.toLowerCase().replace(/\s+/g, "-")}`}>{l}</NavLink>)}
+            {NAV.filter((x) => !x[2]).map(([l, to], i) => <NavLink key={l} to={to} className={`hover:text-[color:var(--gold)] transition-colors whitespace-nowrap ${i >= 4 ? "hidden xl:inline" : ""}`} data-testid={`nav-${l.toLowerCase().replace(/\s+/g, "-")}`}>{l}</NavLink>)}
           </nav>
         </div>
         <Link to="/" data-testid="header-logo" className="justify-self-center"><Logo /></Link>
